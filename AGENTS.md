@@ -2,9 +2,17 @@
 
 Instructions for AI agents working with this repository.
 
-## Documentation Language
+## Overview
 
-All documentation in this repository must be written in English.
+This repository is a Claude Code plugin marketplace containing multiple plugins.
+Each plugin provides skills that extend Claude Code's capabilities.
+
+## Guidelines
+
+- **Language**: All documentation must be written in English.
+- **Naming**: Use lowercase, hyphen-separated names (e.g., `android-tools`,
+  `list-emulators`)
+- **Versioning**: Follow semver format (e.g., `0.1.0`)
 
 ## Project Structure
 
@@ -22,23 +30,21 @@ claude-plugins/
 └── README.md
 ```
 
-## Adding a New Plugin
+## Development
 
-Refer to `.claude/skills/add-plugin/SKILL.md` for detailed instructions. Actively use the `add-plugin` skill when creating new plugins.
+### Adding a New Plugin
 
-## Adding a New Skill
+Use the `/add-plugin` skill. See `.claude/skills/add-plugin/SKILL.md` for
+details.
 
-Refer to `.claude/skills/add-skill/SKILL.md` for detailed instructions. Actively use the `add-skill` skill when adding new skills.
+### Adding a New Skill
 
-## Naming Conventions
+Use the `/add-skill` skill. See `.claude/skills/add-skill/SKILL.md` for details.
 
-- Plugin names: lowercase, hyphen-separated (e.g., `android-tools`)
-- Skill names: lowercase, hyphen-separated (e.g., `list-emulators`)
-- Version: semver format (e.g., `0.1.0`)
-
-## Testing
+### Testing
 
 After making changes, test locally:
+
 ```bash
 /plugin marketplace add ./
 /plugin install <plugin-name>@claude-plugins
