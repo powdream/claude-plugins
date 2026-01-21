@@ -34,6 +34,13 @@ claude-plugins/
 
 ## Development
 
+### Bash Script Review
+
+When adding or modifying bash scripts, **always spawn a sub-agent** to review
+the scripts against [Bash Script Convention](./doc/bash-script-convention.md).
+The sub-agent must read the convention document and verify the scripts follow
+all guidelines defined in it.
+
 ### Adding a New Plugin
 
 Use the `/add-plugin` skill. See `.claude/skills/add-plugin/SKILL.md` for
