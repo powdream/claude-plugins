@@ -2,6 +2,10 @@
 
 Instructions for AI agents working with this repository.
 
+## Documentation Language
+
+All documentation in this repository must be written in English.
+
 ## Project Structure
 
 ```
@@ -20,15 +24,11 @@ claude-plugins/
 
 ## Adding a New Plugin
 
-1. Create directory: `plugins/<plugin-name>/`
-2. Create `.claude-plugin/plugin.json` with name, description, version
-3. Add skills under `skills/<skill-name>/SKILL.md`
-4. Register in `.claude-plugin/marketplace.json`
+Refer to `.claude/skills/add-plugin/SKILL.md` for detailed instructions. Actively use the `add-plugin` skill when creating new plugins.
 
 ## Adding a New Skill
 
-1. Create `plugins/<plugin-name>/skills/<skill-name>/SKILL.md`
-2. SKILL.md should contain the skill prompt/instructions
+Refer to `.claude/skills/add-skill/SKILL.md` for detailed instructions. Actively use the `add-skill` skill when adding new skills.
 
 ## Naming Conventions
 
