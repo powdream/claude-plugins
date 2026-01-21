@@ -36,10 +36,43 @@ claude-plugins/
 
 ### Bash Script Review
 
-When adding or modifying bash scripts, **always spawn a sub-agent** to review
-the scripts against [Bash Script Convention](./doc/bash-script-convention.md).
-The sub-agent must read the convention document and verify the scripts follow
-all guidelines defined in it.
+When adding or modifying bash scripts, you MUST complete these steps:
+
+1. **Run shellcheck** on all added/modified scripts:
+   ```bash
+   shellcheck <script-path>
+   ```
+   Fix any issues before proceeding.
+
+2. **Spawn a sub-agent** for convention review with this exact prompt structure:
+   ```
+   Review the following bash scripts against the Bash Script Convention.
+
+   IMPORTANT: You MUST first read the convention document at
+   `<repo-root>/doc/bash-script-convention.md`, then verify EACH of these
+   items for every script:
+
+   Checklist:
+   - [ ] Shebang: `#!/usr/bin/env bash`
+   - [ ] Strict mode: `set -euo pipefail` (executable scripts only)
+   - [ ] Indentation: 2 spaces, no tabs
+   - [ ] Function order: `main()` defined first, helper functions after
+   - [ ] Variables: UPPER_SNAKE_CASE for immutables, `local` for function vars
+   - [ ] Conditionals: `[[ ]]` not `[ ]`
+   - [ ] Environment variables: `${VAR:-}` fallback syntax
+   - [ ] Function documentation: description, arguments, outputs, returns
+
+   Scripts to review:
+   - <list of script paths>
+
+   For each violation found, provide the exact fix.
+   ```
+
+**CAUTION**: Do NOT skip or simplify the sub-agent prompt. The checklist must be included.
+
+**Note**: If there is any conflict between the checklist above and
+`doc/bash-script-convention.md`, the convention document takes precedence.
+Update the checklist in this file to match the convention document.
 
 ### Adding a New Plugin
 
