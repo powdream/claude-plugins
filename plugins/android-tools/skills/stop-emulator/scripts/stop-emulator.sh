@@ -3,10 +3,10 @@ set -euo pipefail
 
 # Stops a running Android emulator.
 #
-# Usage: ./stop-emulator.sh [avd_name]
+# Usage: ./stop-emulator.sh [avd_name_or_serial]
 #
 # Arguments:
-#   avd_name (optional): The name of the AVD to stop
+#   avd_name_or_serial (optional): The name of the AVD or serial (e.g., emulator-5554) to stop
 #
 # Outputs:
 #   JSON object with result information
@@ -19,9 +19,9 @@ source "$SCRIPT_DIR/../../utils.sh"
 # Main entry point
 #
 # Arguments:
-#   $1: AVD name (optional)
+#   $1: AVD name or serial (optional)
 main() {
-  local target_avd=${1:-}
+  local target=${1:-}
 
   local adb
   adb=$(find_adb) || true
@@ -46,8 +46,8 @@ EOF
     running_count=$(echo "$running_data" | grep -c .)
   fi
 
-  # No AVD specified
-  if [[ -z "$target_avd" ]]; then
+  # No target specified
+  if [[ -z "$target" ]]; then
     if [[ "$running_count" -eq 0 ]]; then
       output_error "no running emulator" "Start an emulator first using start-emulator skill"
       exit 1
@@ -63,21 +63,22 @@ EOF
     fi
   fi
 
-  # AVD specified - find it in running emulators
-  local found_serial=""
+  # Target specified - find it in running emulators by AVD name or serial
+  local found_serial="" found_avd=""
   while IFS=' ' read -r serial avd; do
     [[ -z "$serial" ]] && continue
-    if [[ "$avd" == "$target_avd" ]]; then
+    if [[ "$avd" == "$target" || "$serial" == "$target" ]]; then
       found_serial=$serial
+      found_avd=$avd
       break
     fi
   done <<< "$running_data"
 
   if [[ -n "$found_serial" ]]; then
-    stop_emulator "$adb" "$found_serial" "$target_avd"
+    stop_emulator "$adb" "$found_serial" "$found_avd"
     exit 0
   else
-    output_error "cannot find emulator '$target_avd'" "Available running emulators listed below" "$running_data"
+    output_error "cannot find emulator '$target'" "Available running emulators listed below" "$running_data"
     exit 1
   fi
 }

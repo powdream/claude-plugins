@@ -16,12 +16,13 @@ Before running, locate this skill's directory (where this SKILL.md is located),
 then execute:
 
 ```bash
-bash <skill-directory>/scripts/stop-emulator.sh [avd_name]
+bash <skill-directory>/scripts/stop-emulator.sh [avd_name_or_serial]
 ```
 
 Arguments:
 
-- `avd_name` (optional): The name of the AVD to stop
+- `avd_name_or_serial` (optional): The name of the AVD (e.g., `Pixel_6_API_33`)
+  or serial (e.g., `emulator-5554`) to stop
 
 ## JSON Output Schema
 
