@@ -31,19 +31,27 @@ get_prop() {
     "$adb" -s "$serial" shell getprop "$prop" 2>/dev/null | tr -d '\r'
 }
 
+# Escape string for JSON
+json_escape() {
+    local str=$1
+    str=${str//\\/\\\\}
+    str=${str//\"/\\\"}
+    str=${str//$'\n'/\\n}
+    str=${str//$'\r'/}
+    str=${str//$'\t'/\\t}
+    echo "$str"
+}
+
 # Main
 ADB=$(find_adb)
 if [[ -z "$ADB" ]]; then
     cat <<'EOF'
-Error: adb not found
-
-Please do one of the following:
-  - Add adb to PATH
-  - Set ANDROID_HOME environment variable
-  - Set ANDROID_SDK_ROOT environment variable
-
-Example:
-  export ANDROID_HOME=~/Android/Sdk
+{
+  "success": false,
+  "error": "adb not found",
+  "hint": "Set ANDROID_HOME or ANDROID_SDK_ROOT environment variable",
+  "devices": []
+}
 EOF
     exit 1
 fi
@@ -53,29 +61,24 @@ DEVICES=$("$ADB" devices 2>/dev/null | tail -n +2 | grep -v '^$')
 
 if [[ -z "$DEVICES" ]]; then
     cat <<'EOF'
-Connected Devices (0):
-
-No devices connected.
-
-Tips:
-  - Start an emulator: emulator -avd <name>
-  - Enable USB debugging on your physical device
-  - Check USB connection
+{
+  "success": true,
+  "count": 0,
+  "devices": []
+}
 EOF
     exit 0
 fi
 
-# Count devices
-DEVICE_COUNT=$(echo "$DEVICES" | wc -l | tr -d ' ')
+# Start JSON output
+echo "{"
+echo "  \"success\": true,"
 
-echo "Connected Devices ($DEVICE_COUNT):"
-echo ""
-printf "  %-18s %-10s %-18s %-6s %s\n" "SERIAL" "TYPE" "MODEL" "API" "STATUS"
-echo "  $(printf '─%.0s' {1..60})"
+# Build devices array
+devices_json=""
+first=true
 
-# Process each device
 while IFS=$'\t' read -r serial status; do
-    # Skip empty lines
     [[ -z "$serial" ]] && continue
 
     # Determine device type
@@ -90,10 +93,30 @@ while IFS=$'\t' read -r serial status; do
     api=$(get_prop "$ADB" "$serial" "ro.build.version.sdk")
 
     # Clean up values
-    model=${model:-"unknown"}
-    api=${api:-"?"}
+    model=${model:-""}
+    api=${api:-""}
 
-    printf "  %-18s %-10s %-18s %-6s %s\n" "$serial" "$type" "$model" "$api" "$status"
+    # Build JSON object
+    if [[ "$first" == "true" ]]; then
+        first=false
+    else
+        devices_json+=","
+    fi
+
+    devices_json+="
+    {
+      \"serial\": \"$(json_escape "$serial")\",
+      \"type\": \"$(json_escape "$type")\",
+      \"model\": \"$(json_escape "$model")\",
+      \"api\": \"$(json_escape "$api")\",
+      \"status\": \"$(json_escape "$status")\"
+    }"
 done <<< "$DEVICES"
 
-echo ""
+# Count devices
+DEVICE_COUNT=$(echo "$DEVICES" | grep -c .)
+
+echo "  \"count\": $DEVICE_COUNT,"
+echo "  \"devices\": [$devices_json"
+echo "  ]"
+echo "}"

@@ -15,30 +15,69 @@ Run the script to list all connected devices:
 bash plugins/android-tools/skills/list-devices/scripts/list-devices.sh
 ```
 
-The script will:
+The script outputs JSON with device details.
 
-1. Find adb in PATH, ANDROID_HOME, or ANDROID_SDK_ROOT
-2. Display connected devices with details (serial, type, model, API level,
-   status)
-3. Show helpful tips if no devices are connected
+## JSON Output Schema
 
-## Output Format
+### Success
+
+```json
+{
+  "success": true,
+  "count": 2,
+  "devices": [
+    {
+      "serial": "emulator-5554",
+      "type": "emulator",
+      "model": "sdk_gphone64_arm64",
+      "api": "33",
+      "status": "device"
+    },
+    {
+      "serial": "RF8M33XXXXX",
+      "type": "physical",
+      "model": "SM-G998N",
+      "api": "31",
+      "status": "device"
+    }
+  ]
+}
+```
+
+### Failure
+
+```json
+{
+  "success": false,
+  "error": "adb not found",
+  "hint": "Set ANDROID_HOME or ANDROID_SDK_ROOT environment variable",
+  "devices": []
+}
+```
+
+## Formatting the Output
+
+### Success (`success: true`)
+
+Format the JSON output as a table:
 
 ```
 Connected Devices (2):
 
   SERIAL            TYPE       MODEL              API    STATUS
-  ────────────────────────────────────────────────────────────
-  emulator-5554     emulator   Pixel_6_API_33     33     device
+  --------------------------------------------------------------
+  emulator-5554     emulator   sdk_gphone64_arm64 33     device
   RF8M33XXXXX       physical   SM-G998N           31     device
 ```
 
-## Troubleshooting
+- Show empty fields as "-"
+- If `count` is 0, show "No devices connected."
 
-If adb is not found, set one of these environment variables:
+### Failure (`success: false`)
 
-```bash
-export ANDROID_HOME=~/Android/Sdk
-# or
-export ANDROID_SDK_ROOT=~/Android/Sdk
+Show the error message and hint to the user:
+
+```
+Error: adb not found
+Hint: Set ANDROID_HOME or ANDROID_SDK_ROOT environment variable
 ```
