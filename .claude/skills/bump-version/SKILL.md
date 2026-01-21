@@ -17,13 +17,14 @@ Increment a plugin's version number (major, minor, or patch).
 
 If plugin name is provided as argument:
 
-- Use that plugin name
+- Use that plugin name and proceed to step 2
 
 If no argument:
 
 - Infer plugin name from session context (e.g., recently edited files under
   `plugins/<name>/`)
-- Ask user to confirm: "Bump version for `<plugin-name>`?"
+- Use AskUserQuestion tool to confirm: "Bump version for `<plugin-name>`?"
+- **STOP and WAIT for user response before proceeding to step 2**
 
 ### 2. Read Current Version
 
