@@ -21,6 +21,10 @@ source "$SCRIPT_DIR/../../utils.sh"
 # Default ADB port
 DEFAULT_PORT="5555"
 
+# Mutable state for connection target (set by parse_args)
+ip=""
+port=""
+
 # Main entry point
 #
 # Arguments:

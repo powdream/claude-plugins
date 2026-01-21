@@ -14,6 +14,12 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../../utils.sh"
 
 # Main entry point
+#
+# Outputs:
+#   Prints JSON object with device information
+#
+# Returns:
+#   0 on success, 1 if adb not found
 main() {
   local adb
   adb=$(find_adb) || true
@@ -47,22 +53,6 @@ EOF
   print_devices "$adb" "$devices"
 }
 
-# Gets a device property using adb shell getprop
-#
-# Arguments:
-#   $1: adb executable path
-#   $2: device serial number
-#   $3: property name
-#
-# Outputs:
-#   Prints the property value
-get_prop() {
-  local adb=$1
-  local serial=$2
-  local prop=$3
-  "$adb" -s "$serial" shell getprop "$prop" < /dev/null 2>/dev/null | tr -d '\r'
-}
-
 # Prints device information as JSON
 #
 # Arguments:
@@ -92,8 +82,8 @@ print_devices() {
       type="physical"
     fi
 
-    model=$(get_prop "$adb" "$serial" "ro.product.model") || true
-    api=$(get_prop "$adb" "$serial" "ro.build.version.sdk") || true
+    model=$(adb_get_device_prop "$adb" "$serial" "ro.product.model") || true
+    api=$(adb_get_device_prop "$adb" "$serial" "ro.build.version.sdk") || true
 
     model=${model:-""}
     api=${api:-""}

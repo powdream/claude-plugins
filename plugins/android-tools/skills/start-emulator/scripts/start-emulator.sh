@@ -40,9 +40,6 @@ main() {
     output_error "no available emulator" "Create an AVD using Android Studio or avdmanager"
   fi
 
-  local avd_count
-  avd_count=$(echo "$avd_list" | grep -c . || echo "0")
-
   local avd_json
   avd_json=$(avd_list_to_json "$avd_list")
 

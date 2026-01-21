@@ -91,6 +91,9 @@ EOF
 #
 # Outputs:
 #   Prints the AVD name
+#
+# Returns:
+#   0 always
 get_avd_name() {
   local adb=$1
   local serial=$2

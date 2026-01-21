@@ -14,6 +14,12 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../../utils.sh"
 
 # Main entry point
+#
+# Outputs:
+#   Prints JSON object with emulator information
+#
+# Returns:
+#   0 on success, 1 if emulator not found
 main() {
   local emulator
   emulator=$(find_emulator) || true

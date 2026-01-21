@@ -70,3 +70,19 @@ json_escape() {
   str=${str//$'\t'/\\t}
   echo "$str"
 }
+
+# Gets a device property using adb shell getprop
+#
+# Arguments:
+#   $1: adb executable path
+#   $2: device serial number
+#   $3: property name
+#
+# Outputs:
+#   Prints the property value
+adb_get_device_prop() {
+  local adb=$1
+  local serial=$2
+  local prop=$3
+  "$adb" -s "$serial" shell getprop "$prop" < /dev/null 2>/dev/null | tr -d '\r'
+}
