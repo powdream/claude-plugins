@@ -59,12 +59,21 @@ Arguments:
 
 ## Claude's Handling
 
-Follow this flow:
+**IMPORTANT**: ALWAYS ask the user about boot type before launching. Never skip
+this step.
 
-1. **Get available emulators**: Run script with no arguments to get the list
-2. **Select emulator**: If multiple emulators, use `AskUserQuestion` to let user
-   choose. If only one emulator, use that one automatically.
-3. **Select boot type**: Use `AskUserQuestion` to ask "Quick boot or cold boot?"
-   (recommend quick boot as the first option)
-4. **Launch**: Run script with `avd_name` and `boot_type` arguments
-5. **Report result**: Inform user the emulator is starting or show error
+### Flow
+
+1. **Determine emulator**:
+   - If user specified an emulator name → use that name
+   - Otherwise → run script with no arguments to get the list, then ask user to
+     select if multiple emulators exist
+
+2. **Ask boot type** (REQUIRED - never skip): Use `AskUserQuestion` to ask
+   "Quick boot or cold boot?"
+   - First option: "Quick boot (Recommended)"
+   - Second option: "Cold boot"
+
+3. **Launch**: Run script with `avd_name` and `boot_type` arguments
+
+4. **Report result**: Inform user the emulator is starting or show error
