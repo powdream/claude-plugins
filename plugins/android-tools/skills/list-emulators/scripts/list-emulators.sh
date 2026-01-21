@@ -1,27 +1,8 @@
 #!/bin/bash
 
-# Find emulator executable
-find_emulator() {
-    # Check PATH first
-    if command -v emulator &>/dev/null; then
-        echo "emulator"
-        return 0
-    fi
-
-    # Check ANDROID_HOME
-    if [[ -n "$ANDROID_HOME" && -x "$ANDROID_HOME/emulator/emulator" ]]; then
-        echo "$ANDROID_HOME/emulator/emulator"
-        return 0
-    fi
-
-    # Check ANDROID_SDK_ROOT
-    if [[ -n "$ANDROID_SDK_ROOT" && -x "$ANDROID_SDK_ROOT/emulator/emulator" ]]; then
-        echo "$ANDROID_SDK_ROOT/emulator/emulator"
-        return 0
-    fi
-
-    return 1
-}
+# Source common utilities
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../../utils.sh"
 
 # Get value from config.ini
 get_config_value() {
@@ -34,17 +15,6 @@ get_config_value() {
 extract_api_level() {
     local sysdir=$1
     echo "$sysdir" | grep -oE 'android-[0-9]+' | grep -oE '[0-9]+' | head -1
-}
-
-# Escape string for JSON
-json_escape() {
-    local str=$1
-    str=${str//\\/\\\\}
-    str=${str//\"/\\\"}
-    str=${str//$'\n'/\\n}
-    str=${str//$'\r'/}
-    str=${str//$'\t'/\\t}
-    echo "$str"
 }
 
 # Main
