@@ -1,0 +1,13 @@
+{
+  "name": "claude-plugins",
+  "owner": {
+    "name": "powdream"
+  },
+  "plugins": [
+    {
+      "name": "android-tools",
+      "source": "./plugins/android-tools",
+      "description": "Android CLI tools: adb, emulator control, and device management"
+    }
+  ]
+}
