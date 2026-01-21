@@ -46,17 +46,9 @@ main() {
   local avd_json
   avd_json=$(avd_list_to_json "$avd_list")
 
-  # No AVD name specified
+  # No AVD name specified - return list for Claude to ask user
   if [[ -z "$avd_name" ]]; then
-    if [[ "$avd_count" -eq 1 ]]; then
-      # Only one emulator, launch it
-      local single_avd
-      single_avd=$(echo "$avd_list" | head -1)
-      launch_emulator "$emulator" "$single_avd" "$boot_type"
-    else
-      # Multiple emulators, ask user to select
-      output_select_emulator "$avd_json"
-    fi
+    output_select_emulator "$avd_json"
     exit 0
   fi
 

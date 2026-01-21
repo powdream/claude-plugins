@@ -60,7 +60,7 @@ get_prop() {
   local adb=$1
   local serial=$2
   local prop=$3
-  "$adb" -s "$serial" shell getprop "$prop" 2>/dev/null | tr -d '\r'
+  "$adb" -s "$serial" shell getprop "$prop" < /dev/null 2>/dev/null | tr -d '\r'
 }
 
 # Prints device information as JSON
@@ -80,6 +80,7 @@ print_devices() {
 
   local devices_json=""
   local first=true
+  local device_count=0
   local serial status type model api
 
   while IFS=$'\t' read -r serial status; do
@@ -91,8 +92,8 @@ print_devices() {
       type="physical"
     fi
 
-    model=$(get_prop "$adb" "$serial" "ro.product.model")
-    api=$(get_prop "$adb" "$serial" "ro.build.version.sdk")
+    model=$(get_prop "$adb" "$serial" "ro.product.model") || true
+    api=$(get_prop "$adb" "$serial" "ro.build.version.sdk") || true
 
     model=${model:-""}
     api=${api:-""}
@@ -111,10 +112,9 @@ print_devices() {
       \"api\": \"$(json_escape "$api")\",
       \"status\": \"$(json_escape "$status")\"
     }"
-  done <<< "$devices"
 
-  local device_count
-  device_count=$(echo "$devices" | grep -c .)
+    device_count=$((device_count + 1))
+  done <<< "$devices"
 
   echo "  \"count\": $device_count,"
   echo "  \"devices\": [$devices_json"

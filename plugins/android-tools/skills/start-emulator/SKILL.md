@@ -59,8 +59,12 @@ Arguments:
 
 ## Claude's Handling
 
-1. If JSON has `action: "select_emulator"`, use `AskUserQuestion` to let user
-   choose
-2. Before launching, ask user: "Quick boot or cold boot?" using
-   `AskUserQuestion` (recommend quick boot)
-3. After successful launch, inform user the emulator is starting
+Follow this flow:
+
+1. **Get available emulators**: Run script with no arguments to get the list
+2. **Select emulator**: If multiple emulators, use `AskUserQuestion` to let user
+   choose. If only one emulator, use that one automatically.
+3. **Select boot type**: Use `AskUserQuestion` to ask "Quick boot or cold boot?"
+   (recommend quick boot as the first option)
+4. **Launch**: Run script with `avd_name` and `boot_type` arguments
+5. **Report result**: Inform user the emulator is starting or show error

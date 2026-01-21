@@ -93,7 +93,7 @@ EOF
 get_avd_name() {
   local adb=$1
   local serial=$2
-  "$adb" -s "$serial" emu avd name 2>/dev/null | head -1 | tr -d '\r'
+  "$adb" -s "$serial" emu avd name < /dev/null 2>/dev/null | head -1 | tr -d '\r'
 }
 
 # Gets list of running emulators with their AVD names
