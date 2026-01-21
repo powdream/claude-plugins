@@ -13,6 +13,8 @@ Each plugin provides skills that extend Claude Code's capabilities.
 - **Naming**: Use lowercase, hyphen-separated names (e.g., `android-tools`,
   `list-emulators`)
 - **Versioning**: Follow semver format (e.g., `0.1.0`)
+- **Bash Scripts**: Follow
+  [Bash Script Convention](./doc/bash-script-convention.md)
 
 ## Project Structure
 

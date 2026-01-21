@@ -3,7 +3,10 @@
     "allow": [
       "Skill(add-plugin)",
       "Skill(add-skill)",
-      "Skill(commit)"
+      "Skill(commit)",
+      "Bash(tree:*)",
+      "Bash(shellcheck:*)",
+      "Bash(echo:*)"
     ]
   },
   "hooks": {
@@ -13,7 +16,16 @@
         "hooks": [
           {
             "type": "command",
-            "command": "jq -r '.tool_input.file_path' | { read file_path; if echo \"$file_path\" | grep -qE '\\.md$'; then deno fmt \"$file_path\"; fi; }"
+            "command": "jq -r '.tool_input.file_path' | { read file_path; if [[ \"$file_path\" == *.md ]]; then deno fmt \"$file_path\"; fi; }"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path' | { read file_path; if [[ \"$file_path\" == *.sh ]]; then shellcheck \"$file_path\"; fi; }"
           }
         ]
       }
