@@ -82,6 +82,23 @@ Benefits:
 - Only script output consumes tokens
 - More reliable than generated code
 
+## Script Path Resolution
+
+**Important**: Skills are loaded from a plugin cache, not the repository.
+Hardcoded paths like `plugins/foo/skills/bar/scripts/script.sh` will NOT work.
+
+When referencing scripts in SKILL.md, use this pattern:
+
+```markdown
+**Script location**: `scripts/my-script.sh` (relative to this skill's directory)
+
+Before running, locate this skill's directory (where this SKILL.md is located),
+then execute: bash <skill-directory>/scripts/my-script.sh
+```
+
+This ensures Claude finds the correct script path regardless of where the plugin
+is installed.
+
 ## Reference
 
 - Agent Skills overview:

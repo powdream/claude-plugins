@@ -9,10 +9,14 @@ Display connected Android devices and emulators using adb.
 
 ## Instructions
 
-Run the script to list all connected devices:
+**Script location**: `scripts/list-devices.sh` (relative to this skill's
+directory)
+
+Before running, locate this skill's directory (where this SKILL.md is located),
+then execute:
 
 ```bash
-bash plugins/android-tools/skills/list-devices/scripts/list-devices.sh
+bash <skill-directory>/scripts/list-devices.sh
 ```
 
 The script outputs JSON with device details.

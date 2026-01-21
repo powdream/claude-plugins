@@ -9,10 +9,14 @@ Display installed Android emulators (AVDs) with detailed information.
 
 ## Instructions
 
-Run the script to list all installed emulators:
+**Script location**: `scripts/list-emulators.sh` (relative to this skill's
+directory)
+
+Before running, locate this skill's directory (where this SKILL.md is located),
+then execute:
 
 ```bash
-bash plugins/android-tools/skills/list-emulators/scripts/list-emulators.sh
+bash <skill-directory>/scripts/list-emulators.sh
 ```
 
 The script outputs JSON with emulator details.
