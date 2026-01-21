@@ -1,20 +1,24 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Lists connected Android devices with their properties.
+#
+# Usage: ./list-devices.sh
+#
+# Outputs:
+#   JSON object with device information
 
 # Source common utilities
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck disable=SC1091
 source "$SCRIPT_DIR/../../utils.sh"
 
-# Get device property
-get_prop() {
-    local adb=$1
-    local serial=$2
-    local prop=$3
-    "$adb" -s "$serial" shell getprop "$prop" 2>/dev/null | tr -d '\r'
-}
+# Main entry point
+main() {
+  local adb
+  adb=$(find_adb) || true
 
-# Main
-ADB=$(find_adb)
-if [[ -z "$ADB" ]]; then
+  if [[ -z "$adb" ]]; then
     cat <<'EOF'
 {
   "success": false,
@@ -24,12 +28,12 @@ if [[ -z "$ADB" ]]; then
 }
 EOF
     exit 1
-fi
+  fi
 
-# Get device list
-DEVICES=$("$ADB" devices 2>/dev/null | tail -n +2 | grep -v '^$')
+  local devices
+  devices=$("$adb" devices 2>/dev/null | tail -n +2 | grep -v '^$') || true
 
-if [[ -z "$DEVICES" ]]; then
+  if [[ -z "$devices" ]]; then
     cat <<'EOF'
 {
   "success": true,
@@ -38,39 +42,65 @@ if [[ -z "$DEVICES" ]]; then
 }
 EOF
     exit 0
-fi
+  fi
 
-# Start JSON output
-echo "{"
-echo "  \"success\": true,"
+  print_devices "$adb" "$devices"
+}
 
-# Build devices array
-devices_json=""
-first=true
+# Gets a device property using adb shell getprop
+#
+# Arguments:
+#   $1: adb executable path
+#   $2: device serial number
+#   $3: property name
+#
+# Outputs:
+#   Prints the property value
+get_prop() {
+  local adb=$1
+  local serial=$2
+  local prop=$3
+  "$adb" -s "$serial" shell getprop "$prop" 2>/dev/null | tr -d '\r'
+}
 
-while IFS=$'\t' read -r serial status; do
+# Prints device information as JSON
+#
+# Arguments:
+#   $1: adb executable path
+#   $2: device list from adb devices
+#
+# Outputs:
+#   Prints JSON object with device information
+print_devices() {
+  local adb=$1
+  local devices=$2
+
+  echo "{"
+  echo "  \"success\": true,"
+
+  local devices_json=""
+  local first=true
+  local serial status type model api
+
+  while IFS=$'\t' read -r serial status; do
     [[ -z "$serial" ]] && continue
 
-    # Determine device type
     if [[ "$serial" == emulator-* ]]; then
-        type="emulator"
+      type="emulator"
     else
-        type="physical"
+      type="physical"
     fi
 
-    # Get device info
-    model=$(get_prop "$ADB" "$serial" "ro.product.model")
-    api=$(get_prop "$ADB" "$serial" "ro.build.version.sdk")
+    model=$(get_prop "$adb" "$serial" "ro.product.model")
+    api=$(get_prop "$adb" "$serial" "ro.build.version.sdk")
 
-    # Clean up values
     model=${model:-""}
     api=${api:-""}
 
-    # Build JSON object
     if [[ "$first" == "true" ]]; then
-        first=false
+      first=false
     else
-        devices_json+=","
+      devices_json+=","
     fi
 
     devices_json+="
@@ -81,12 +111,15 @@ while IFS=$'\t' read -r serial status; do
       \"api\": \"$(json_escape "$api")\",
       \"status\": \"$(json_escape "$status")\"
     }"
-done <<< "$DEVICES"
+  done <<< "$devices"
 
-# Count devices
-DEVICE_COUNT=$(echo "$DEVICES" | grep -c .)
+  local device_count
+  device_count=$(echo "$devices" | grep -c .)
 
-echo "  \"count\": $DEVICE_COUNT,"
-echo "  \"devices\": [$devices_json"
-echo "  ]"
-echo "}"
+  echo "  \"count\": $device_count,"
+  echo "  \"devices\": [$devices_json"
+  echo "  ]"
+  echo "}"
+}
+
+main "$@"
