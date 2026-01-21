@@ -68,6 +68,7 @@ claude --plugin-dir ./plugins/<plugin-name>
 ## Using Complex Scripts
 
 When complex logic is needed:
+
 1. Create bash scripts in `scripts/` directory
 2. Reference script execution in SKILL.md
 3. Only script output goes to context, making it token-efficient
@@ -79,4 +80,5 @@ Read the official documentation for more details.
 ### Official Documentation
 
 - Create plugins: https://code.claude.com/docs/en/plugins
-- Agent skills: https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview
+- Agent skills:
+  https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview

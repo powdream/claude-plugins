@@ -41,11 +41,13 @@ description: Brief description of what this skill does and when to use it
 ## Required Fields
 
 ### name
+
 - Maximum 64 characters
 - Lowercase letters, numbers, and hyphens only
 - Cannot contain "anthropic" or "claude"
 
 ### description
+
 - Must be non-empty
 - Maximum 1024 characters
 - Include both what the skill does AND when to use it
@@ -53,12 +55,16 @@ description: Brief description of what this skill does and when to use it
 ## Three Levels of Content
 
 ### Level 1: Metadata (always loaded)
+
 YAML frontmatter with `name` and `description`. Loaded at startup (~100 tokens).
 
 ### Level 2: Instructions (loaded when triggered)
-Main body of SKILL.md. Loaded when skill is triggered (under 5k tokens recommended).
+
+Main body of SKILL.md. Loaded when skill is triggered (under 5k tokens
+recommended).
 
 ### Level 3: Resources (loaded as needed)
+
 Additional files and scripts. Only loaded when referenced.
 
 ## Using Scripts
@@ -71,11 +77,14 @@ skills/<skill-name>/scripts/
 ```
 
 Benefits:
+
 - Script code never enters context window
 - Only script output consumes tokens
 - More reliable than generated code
 
 ## Reference
 
-- Agent Skills overview: https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview
-- Best practices: https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices
+- Agent Skills overview:
+  https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview
+- Best practices:
+  https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices
