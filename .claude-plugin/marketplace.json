@@ -11,8 +11,11 @@
     },
     {
       "name": "invoke-agent",
-      "source": "github",
-      "repo": "powdream/invoke-agent"
+      "source": {
+        "source": "github",
+        "repo": "powdream/invoke-agent"
+      },
+      "description": "Invoke external AI agents (Claude, Cursor Agent, Gemini) from Claude Code"
     }
   ]
 }
