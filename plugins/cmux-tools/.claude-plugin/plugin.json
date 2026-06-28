@@ -1,0 +1,5 @@
+{
+  "name": "cmux-tools",
+  "description": "cmux remote-control helpers: inject Claude Code slash commands into local cmux panes, for a single session or broadcast to all",
+  "version": "0.1.0"
+}

@@ -16,6 +16,26 @@
         "repo": "powdream/invoke-agent"
       },
       "description": "Invoke external AI agents (Claude, Cursor Agent, Gemini) from Claude Code"
+    },
+    {
+      "name": "worktree-tools",
+      "source": "./plugins/worktree-tools",
+      "description": "Open the current git worktree in a target environment: a cmux split pane, a new cmux workspace, or VS Code"
+    },
+    {
+      "name": "cmux-tools",
+      "source": "./plugins/cmux-tools",
+      "description": "cmux remote-control helpers: inject Claude Code slash commands into local cmux panes, for a single session or broadcast to all"
+    },
+    {
+      "name": "markdown-tools",
+      "source": "./plugins/markdown-tools",
+      "description": "View or open Markdown files: surface full content over remote control, or open locally in the macOS default app"
+    },
+    {
+      "name": "pr-tools",
+      "source": "./plugins/pr-tools",
+      "description": "GitHub pull request helpers: maintain a stacked-PR series section consistently across a chain of open and merged PRs"
     }
   ]
 }

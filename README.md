@@ -18,6 +18,38 @@ Android CLI tools: adb, emulator control, and device management.
 /plugin install android-tools@claude-plugins
 ```
 
+### worktree-tools
+
+Open the current git worktree in a target environment: a cmux split pane, a new cmux workspace, or VS Code.
+
+```bash
+/plugin install worktree-tools@claude-plugins
+```
+
+### cmux-tools
+
+cmux remote-control helpers: inject Claude Code slash commands into local cmux panes, for a single session or broadcast to all.
+
+```bash
+/plugin install cmux-tools@claude-plugins
+```
+
+### markdown-tools
+
+View or open Markdown files: surface full content over remote control, or open locally in the macOS default app.
+
+```bash
+/plugin install markdown-tools@claude-plugins
+```
+
+### pr-tools
+
+GitHub pull request helpers: maintain a stacked-PR series section consistently across a chain of open and merged PRs.
+
+```bash
+/plugin install pr-tools@claude-plugins
+```
+
 ## License
 
 MIT

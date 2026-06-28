@@ -1,0 +1,5 @@
+{
+  "name": "pr-tools",
+  "description": "GitHub pull request helpers: maintain a stacked-PR series section consistently across a chain of open and merged PRs",
+  "version": "0.1.0"
+}

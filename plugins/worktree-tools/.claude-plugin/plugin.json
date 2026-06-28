@@ -1,0 +1,5 @@
+{
+  "name": "worktree-tools",
+  "description": "Open the current git worktree in a target environment: a cmux split pane, a new cmux workspace, or VS Code",
+  "version": "0.1.0"
+}
