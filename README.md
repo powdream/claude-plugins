@@ -44,7 +44,7 @@ View or open Markdown files: surface full content over remote control, or open l
 
 ### pr-tools
 
-GitHub pull request helpers: maintain a stacked-PR series section consistently across a chain of open and merged PRs.
+GitHub pull request helpers: maintain a stacked-PR series section across a chain of PRs, and open a PR in Google Chrome.
 
 ```bash
 /plugin install pr-tools@claude-plugins
