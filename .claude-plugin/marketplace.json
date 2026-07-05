@@ -40,7 +40,7 @@
     {
       "name": "session-tools",
       "source": "./plugins/session-tools",
-      "description": "Session-lifecycle helpers: a self-check reminder that re-injects an independent-verification directive after compaction and periodically in long sessions"
+      "description": "Session-lifecycle helpers: a self-check reminder that re-injects an independent-verification directive after compaction and periodically in long sessions, plus a write-handoff-prompt skill for authoring bias-free continuation prompts"
     }
   ]
 }
