@@ -1,0 +1,5 @@
+{
+  "name": "session-tools",
+  "description": "Session-lifecycle helpers. Includes a self-check reminder that re-injects an independent-verification (anti-sycophancy) directive after compaction and periodically in long sessions.",
+  "version": "0.1.0"
+}
