@@ -50,6 +50,14 @@ GitHub pull request helpers: maintain a stacked-PR series section across a chain
 /plugin install pr-tools@claude-plugins
 ```
 
+### session-tools
+
+Session-lifecycle helpers. Currently: a self-check reminder that re-injects an independent-verification (anti-sycophancy) directive after compaction and every N prompts (default 10, override with `SESSION_TOOLS_SELF_CHECK_INTERVAL`), to counter attention decay in long sessions.
+
+```bash
+/plugin install session-tools@claude-plugins
+```
+
 ## License
 
 MIT
