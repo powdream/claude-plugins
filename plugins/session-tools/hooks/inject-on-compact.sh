@@ -14,15 +14,15 @@ set -euo pipefail
 # Outputs: SessionStart hookSpecificOutput JSON on inject, otherwise nothing
 # Returns: always 0 (fail-safe)
 main() {
-  local script_dir input source reminder
+  local script_dir input start_source reminder
   script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 
   command -v jq >/dev/null 2>&1 || return 0
 
   input="$(cat)"
-  source="$(printf '%s' "$input" | jq -r '.source // empty' 2>/dev/null || true)"
+  start_source="$(printf '%s' "$input" | jq -r '.source // empty' 2>/dev/null || true)"
 
-  case "$source" in
+  case "$start_source" in
     compact | resume) ;;
     *) return 0 ;;
   esac
