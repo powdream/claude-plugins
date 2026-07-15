@@ -1,0 +1,5 @@
+{
+  "name": "review-tools",
+  "description": "Cross-review helpers. Each skill reviews an artifact with two independent reviewer agents that check each other, and adjudicates any single-reviewer finding before it is adopted so no one reviewer's blind spot or overreach slips through. Includes cross-doc-review (document / prose quality) and cross-code-review (code changes).",
+  "version": "0.1.0"
+}

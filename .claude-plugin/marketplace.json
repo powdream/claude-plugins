@@ -41,6 +41,11 @@
       "name": "session-tools",
       "source": "./plugins/session-tools",
       "description": "Session-lifecycle helpers: a self-check reminder that re-injects an independent-verification directive after compaction and periodically in long sessions, plus a write-handoff-prompt skill for authoring bias-free continuation prompts"
+    },
+    {
+      "name": "review-tools",
+      "source": "./plugins/review-tools",
+      "description": "Cross-review helpers: skills that review an artifact with two independent reviewer agents which check each other and adjudicate any single-reviewer finding before it is adopted (cross-doc-review for prose, cross-code-review for code changes)"
     }
   ]
 }
