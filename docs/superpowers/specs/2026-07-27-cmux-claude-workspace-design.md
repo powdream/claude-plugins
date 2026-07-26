@@ -1,4 +1,4 @@
-# cmux-claude-workspace — Design
+# cmux-new-workspace — Design
 
 ## Goal
 
@@ -13,7 +13,9 @@ Directory candidates are ranked by **recency of Claude Code use**.
 
 - Plugin: `cmux-tools` (already holds `cmux-slash`; this is another cmux
   workspace/pane manipulation skill).
-- Path: `plugins/cmux-tools/skills/cmux-claude-workspace/SKILL.md`
+- Path: `plugins/cmux-tools/skills/cmux-new-workspace/SKILL.md`
+- Name: `cmux-new-workspace`, not `cmux-claude-workspace` — the repo's
+  `add-skill` guide forbids `claude` in a skill `name`.
 - `cmux-tools` version: `0.1.0` → `0.2.0` (new skill, additive).
 
 `worktree-tools` was rejected as a home: its three skills are all scoped to "the
@@ -111,25 +113,33 @@ Verified output shape:
 
 Take `surfaces[0].ref` and `window_ref`.
 
-### 6. Wait for Claude to finish booting (poll)
+### 6. Wait for the TUI to accept input (poll `read-screen`)
 
-Sending `/rename` before the TUI is up would leak the text into the shell and
-run it as a command. Poll instead — 1 s interval, 60 s timeout:
+Sending `/rename` too early would leak the text into the shell, or answer a
+blocking prompt. Poll the pane's screen — 1 s interval, 60 s timeout:
 
 ```bash
-cmux top --all --processes --flat --format tsv
-# columns: cpu_percent, memory_bytes, process_count, kind, ref, parent_ref, title
+cmux read-screen --window <win> --surface <surf>
 ```
 
-A Claude pane is a row where `kind == "process"`, `parent_ref` equals the target
-surface, and `title` matches `^\d+\.\d+\.\d+` (Claude Code reports its version
-as the process label).
+Ready when the output contains `shift+tab to cycle` or `? for shortcuts`. Both
+footers are rendered by Claude Code itself, so the check is portable.
 
-Verified sample row:
+**Process polling was tried first and rejected.** `cmux top --processes` shows
+the `claude` row (parent = the surface, title = a version string like `2.1.220`)
+about **one second** after launch — measured — while the screen is still:
 
 ```
-0.7	441583152	1	process	4822	surface:1	2.1.219
+❯ 1. Yes, I trust this folder
+  2. No, exit
 ```
+
+Typing `/rename …` + Enter at that point answers the trust prompt instead of
+renaming anything. Process presence is therefore not a readiness signal.
+
+When the trust prompt is detected (`one you trust` on screen), the skill aborts
+and leaves it for the user — silently accepting it would be trusting a folder on
+their behalf.
 
 ### 7. Inject the slash commands
 
@@ -140,14 +150,26 @@ cmux send     --window <win> --surface <surf> -- "/rc"
 cmux send-key --window <win> --surface <surf> enter
 ```
 
-`/rename` takes its argument inline, so one line per command.
+`/rename` takes its argument inline, so one line per command. Verified
+end-to-end against a live pane.
 
 `--window` is mandatory alongside a short `surface:<n>` ref. Without it the ref
 resolves against `$CMUX_WORKSPACE_ID` — the caller's own workspace — and the
 commands land in the wrong pane. This trap is already documented in
 `cmux-slash`.
 
-### 8. Report
+### 8. Verify the rename, then report
+
+After `/rename`, Claude labels the input box's top border with the session name
+(`─── my-session ──`). Grep `read-screen` for it; warn if absent.
+
+Do **not** verify against the status line. `session:<name>` and the `/rc`
+indicator observed during testing came from a user-configured `statusLine`
+script (`~/.claude/statusline.sh`), not from Claude Code, and are absent on a
+default setup — this skill ships in a public marketplace.
+
+`/rc` has no portable on-screen signal, so it is reported as sent, never as
+confirmed.
 
 Echo the resolved path, session name, workspace ref, and surface ref.
 
@@ -160,7 +182,9 @@ Every failure is reported as fact; none is silently swallowed.
 | `cmux` binary missing         | Abort before creating anything                                                                          |
 | Chosen path does not exist    | Abort; never substitute another directory                                                               |
 | Zero candidates from the scan | Ask the user for a path directly                                                                        |
+| Trust-folder prompt on screen | Stop; leave the decision to the user and print the two commands to type                                 |
 | Poll times out (60 s)         | Leave the workspace open, state that injection did not happen, tell the user which two commands to type |
+| Name absent after `/rename`   | Report the warning; never claim the rename worked                                                       |
 
 ## Non-goals
 

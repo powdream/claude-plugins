@@ -25,7 +25,7 @@
     {
       "name": "cmux-tools",
       "source": "./plugins/cmux-tools",
-      "description": "cmux remote-control helpers: inject Claude Code slash commands into local cmux panes, for a single session or broadcast to all"
+      "description": "cmux workspace helpers: open a new workspace running a named, remote-controlled Claude Code session, and inject slash commands into already-running panes (one session or broadcast to all)"
     },
     {
       "name": "markdown-tools",
