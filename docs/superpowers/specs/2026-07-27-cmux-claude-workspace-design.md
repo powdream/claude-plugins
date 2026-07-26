@@ -137,9 +137,20 @@ about **one second** after launch — measured — while the screen is still:
 Typing `/rename …` + Enter at that point answers the trust prompt instead of
 renaming anything. Process presence is therefore not a readiness signal.
 
-When the trust prompt is detected (`one you trust` on screen), the skill aborts
-and leaves it for the user — silently accepting it would be trusting a folder on
-their behalf.
+### 6a. Trust prompt
+
+When `one you trust` is on screen, the skill **asks the user** what to do,
+quoting the directory. Approved → send Enter (option 1 is preselected) and
+resume the readiness poll. Declined → send nothing and leave the prompt
+standing.
+
+It is never answered on the skill's own initiative: accepting grants Claude
+read, edit, and execute rights in that folder from then on.
+
+This forces Step 4 to end at a state marker (`ready` / `trust-prompt` /
+`timeout`) rather than running straight through — a question cannot be asked
+from inside a single bash block, and shell variables do not survive between
+blocks, so the surface and window refs are echoed and re-declared downstream.
 
 ### 7. Inject the slash commands
 
@@ -182,7 +193,7 @@ Every failure is reported as fact; none is silently swallowed.
 | `cmux` binary missing         | Abort before creating anything                                                                          |
 | Chosen path does not exist    | Abort; never substitute another directory                                                               |
 | Zero candidates from the scan | Ask the user for a path directly                                                                        |
-| Trust-folder prompt on screen | Stop; leave the decision to the user and print the two commands to type                                 |
+| Trust-folder prompt on screen | Ask the user; Enter only on approval, otherwise leave the prompt standing                               |
 | Poll times out (60 s)         | Leave the workspace open, state that injection did not happen, tell the user which two commands to type |
 | Name absent after `/rename`   | Report the warning; never claim the rename worked                                                       |
 

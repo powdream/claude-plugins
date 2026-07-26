@@ -97,9 +97,10 @@ twice: as the `/rename` argument and as the cmux workspace `--name`.
 Default is `claude`. Use `claude --continue` **only** when the user explicitly
 asked to resume ("이어서", "resume", "--continue"). Do not ask otherwise.
 
-## Step 4 — Create, wait, inject
+## Step 4 — Create the workspace and wait for the TUI
 
-Fill in the three variables from steps 1-3, then run this as one block.
+Fill in the three variables from steps 1-3, then run this block. It stops at one
+of three states and prints the state on the last line.
 
 ```bash
 CMUX=/Applications/cmux.app/Contents/Resources/bin/cmux
@@ -124,30 +125,78 @@ echo "workspace=$WS surface=$SURF window=$WIN cwd=$DIR"
 # Wait until the TUI actually accepts input. Read the screen — do NOT poll for the
 # claude process, which appears ~1s in, long before the input box is live and also
 # while a blocking prompt is on screen.
-READY=0
+STATE=timeout
 for _ in $(seq 60); do
   SCREEN=$("$CMUX" read-screen --window "$WIN" --surface "$SURF" 2>/dev/null)
   if printf '%s' "$SCREEN" | grep -q "one you trust"; then
-    echo "ABORT: Claude is asking whether $DIR is a folder you trust."
-    echo "Answer that prompt in the new workspace yourself, then type:"
-    echo "  /rename $NAME"
-    echo "  /rc"
-    exit 1
+    STATE=trust-prompt
+    break
   fi
   if printf '%s' "$SCREEN" | grep -qE "shift\+tab to cycle|\? for shortcuts"; then
-    READY=1
+    STATE=ready
     break
   fi
   sleep 1
 done
+echo "STATE=$STATE"
+```
 
-if [ "$READY" -ne 1 ]; then
-  echo "TIMEOUT: Claude did not reach its input box in $SURF within 60s."
-  echo "The workspace is open at $DIR — type these there manually:"
-  echo "  /rename $NAME"
-  echo "  /rc"
-  exit 1
-fi
+Branch on the last line:
+
+- `STATE=ready` → go to **Step 5**.
+- `STATE=trust-prompt` → go to **Step 4a** first.
+- `STATE=timeout` → stop. Leave the workspace open, say the injection did not
+  happen, and print `/rename <name>` and `/rc` for the user to type themselves.
+
+## Step 4a — Trust prompt (only when `STATE=trust-prompt`)
+
+Claude is showing:
+
+```
+❯ 1. Yes, I trust this folder
+  2. No, exit
+```
+
+**Ask the user before answering it.** Use `AskUserQuestion`, quote the
+directory, and make the two outcomes explicit — accepting grants Claude read,
+edit, and execute rights in that folder from now on, so it is the user's call,
+not yours.
+
+- Approved → send Enter (option 1 is preselected), then poll for readiness again
+  with the block below, and continue to Step 5.
+- Declined → send nothing. Leave the prompt on screen and tell the user the
+  workspace is open at `<dir>` with the question still waiting; they can answer
+  it or close the workspace.
+
+Shell variables do not survive between blocks, so re-declare `SURF`/`WIN` from
+the values Step 4 printed.
+
+```bash
+CMUX=/Applications/cmux.app/Contents/Resources/bin/cmux
+SURF="<surface from step 4>"
+WIN="<window from step 4>"
+
+"$CMUX" send-key --window "$WIN" --surface "$SURF" enter
+
+STATE=timeout
+for _ in $(seq 60); do
+  if "$CMUX" read-screen --window "$WIN" --surface "$SURF" 2>/dev/null \
+     | grep -qE "shift\+tab to cycle|\? for shortcuts"; then
+    STATE=ready
+    break
+  fi
+  sleep 1
+done
+echo "STATE=$STATE"
+```
+
+## Step 5 — Inject and verify
+
+```bash
+CMUX=/Applications/cmux.app/Contents/Resources/bin/cmux
+SURF="<surface from step 4>"
+WIN="<window from step 4>"
+NAME="<session name>"
 
 "$CMUX" send     --window "$WIN" --surface "$SURF" -- "/rename $NAME"
 "$CMUX" send-key --window "$WIN" --surface "$SURF" enter
@@ -182,27 +231,29 @@ Notes on the mechanics:
   `/rc` indicator come from a user-configured `statusLine` script, not from
   Claude Code — they are absent on a default setup. The input box border label
   is built in, so that is what the check above greps for.
-- The trust prompt is left for the user to answer. Silently accepting it would
-  be trusting a folder on their behalf.
+- **Never answer the trust prompt on your own initiative.** Accepting it grants
+  Claude read, edit, and execute rights in that folder from then on — that is
+  the user's decision. Ask first (Step 4a); send Enter only after they approve.
 - `/rc` is sent but not verified — there is no portable on-screen signal for it.
   Report it as sent, not as confirmed.
 
-## Step 5 — Report
+## Step 6 — Report
 
 Echo the resolved path, the session name, and the workspace/surface refs. Say
 plainly whether the injection succeeded; on timeout, say the workspace is open
-but the two commands were not sent.
+but the two commands were not sent. If the trust prompt came up, say whether the
+user approved it.
 
 ## Failure handling
 
-| Condition                  | Behavior                                                              |
-| -------------------------- | --------------------------------------------------------------------- |
-| `cmux` binary missing      | Abort before creating anything                                        |
-| Chosen path does not exist | Abort; never substitute a different directory                         |
-| Scan returns nothing       | Ask the user for a path directly                                      |
-| Trust-folder prompt shown  | Stop injecting, leave it for the user, print the two commands to type |
-| Readiness poll times out   | Leave the workspace open, report that injection did not happen        |
-| Name not on screen after   | Report the warning as-is; do not claim the rename worked              |
+| Condition                  | Behavior                                                                |
+| -------------------------- | ----------------------------------------------------------------------- |
+| `cmux` binary missing      | Abort before creating anything                                          |
+| Chosen path does not exist | Abort; never substitute a different directory                           |
+| Scan returns nothing       | Ask the user for a path directly                                        |
+| Trust-folder prompt shown  | Ask the user; send Enter only if approved, otherwise leave it untouched |
+| Readiness poll times out   | Leave the workspace open, report that injection did not happen          |
+| Name not on screen after   | Report the warning as-is; do not claim the rename worked                |
 
 Never claim the session was renamed or remote control started without the
 commands having actually been sent.
