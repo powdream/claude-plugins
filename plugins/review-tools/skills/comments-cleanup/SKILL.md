@@ -28,20 +28,33 @@ git symbolic-ref --short refs/remotes/origin/HEAD               # offline fallba
 prints it that way). If none of them answer, scope from
 `git diff --name-only HEAD` alone, or ask.
 
-Take the union of:
+The changed files are the union of:
 
 ```bash
-git diff --name-only HEAD                   # staged + unstaged
-git diff --name-only <base>...HEAD          # committed on this branch
+git diff --name-only HEAD            # staged + unstaged
+git diff --name-only <base>...HEAD   # committed on this branch
+```
+
+Untracked files are **not** in that union. List them separately — the command
+also picks up scratch files and un-ignored build output, so they are never
+folded in silently:
+
+```bash
 git ls-files --others --exclude-standard    # new files, not yet tracked
 ```
 
-Then use **AskUserQuestion** to pick one:
+If it prints nothing, say nothing about it.
+
+Then use **AskUserQuestion** to pick one. When the untracked list is non-empty,
+name those paths in the question text, so the choice is made with them in view:
 
 - **Changed lines only** — comments on lines this change added or modified.
 - **Whole changed files** — every comment in those files.
+- **Whole changed files + the untracked paths listed** — offer this option only
+  when that list is non-empty.
 
-Never widen beyond the changed files. Never touch a file the change did not
+An untracked file enters the working set only through that third option. Never
+widen past what the user picked, and never touch a file the change did not
 already modify, unless a path argument named it.
 
 ## 2. Apply the survival test

@@ -17,9 +17,10 @@ file-by-file in prose.
 - **One or more PR numbers** → each in turn. Rewriting a whole stack in one pass
   is a normal request.
 - **No PR yet** → `gh pr view` exits non-zero. Produce the title and body, write
-  the body to `/tmp/pr-body-<branch>.md`, show both, and ask before running
-  `gh pr create --title "<title>" --body-file /tmp/pr-body-<branch>.md`. Never
-  create a PR unprompted.
+  the body to `/tmp/pr-body-new.md`, show both, and ask before running
+  `gh pr create --title "<title>" --body-file /tmp/pr-body-new.md`. Never create
+  a PR unprompted. Do not derive that filename from the branch — a branch name
+  with a `/` in it points at a directory that does not exist.
 
 **Before touching any existing PR — every one of them, including each number of
 a multi-PR run — save its current body:**
@@ -110,8 +111,9 @@ gh pr edit <N> --title "<title>" --body-file /tmp/pr-body-<N>.md
 Then assert the stack section survived byte-identical — this must print nothing:
 
 ```bash
-diff <(sed -n '/^## スタック/,$p' /tmp/pr-body-<N>.orig.md) \
-     <(gh pr view <N> --json body -q .body | sed -n '/^## スタック/,$p')
+sed -n '/^## スタック/,$p' /tmp/pr-body-<N>.orig.md > /tmp/pr-stack-<N>.before
+gh pr view <N> --json body -q .body | sed -n '/^## スタック/,$p' > /tmp/pr-stack-<N>.after
+diff /tmp/pr-stack-<N>.before /tmp/pr-stack-<N>.after
 ```
 
 If it prints anything, restore the original —
@@ -121,16 +123,12 @@ Verify the rest: `gh pr view <N> --json title,body`.
 
 ## Examples
 
-Before — tags padding the title, body narrating the diff:
+Before — tag-padded title, file-by-file listing, self-congratulatory closer:
 
 ```
-[FEAT][BE] Refactor the notification pipeline and add retry support with tests (ABC-123)
-
+[FEAT][BE] Refactor the notification pipeline and add retry support (ABC-123)
 ## Changes
 - `notifier.ts`: extracted `sendWithRetry`, +42 lines
-- `notifier.test.ts`: 6 new cases
-- `config.ts`: added `maxRetries`
-
 The pipeline is much cleaner now.
 ```
 
@@ -141,10 +139,8 @@ feat(notifier): retry failed sends (ABC-123)
 
 ## Why
 - Transient 5xx from the provider dropped notifications silently.
-
 ## What
-- Sends retry up to `maxRetries`, then surface as failed.
-
+- Sends are retried up to `maxRetries`, then surfaced as failed.
 ## How
-- Backoff is contained in `sendWithRetry`; callers unchanged.
+- Backoff lives in `sendWithRetry`; callers unchanged.
 ```

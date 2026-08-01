@@ -76,12 +76,15 @@ runs `gh pr create` unprompted.
 
 ### Steps
 
-1. **Derive the repo's convention** — in priority order:
-   `.github/pull_request_template.md` → `CONTRIBUTING.md` → the repo's
-   `CLAUDE.md` / `AGENTS.md` →
-   `gh pr list --state merged --limit 15 --json title,body` to infer title
-   format, body language, and section habits. Report the derived convention in
-   one line before applying it.
+1. **Derive the repo's convention** — two conventions, derived separately,
+   because `.github/pull_request_template.md` governs the body and says nothing
+   about title format. **Body and required sections**: the first source that
+   answers among `.github/pull_request_template.md` → `CONTRIBUTING.md` → the
+   repo's `CLAUDE.md` / `AGENTS.md`. **Title format, prefix, and ticket-ID
+   placement**: those same three sources only when one states a title rule
+   outright, otherwise inferred from
+   `gh pr list --state merged --limit 15 --json title,body`. Report the derived
+   convention in one line before applying it, naming where each field came from.
 2. **Title** — one core change only. No decorative tags, qualifiers, or
    parenthetical filler. A trailing `(...)` is reserved for the issue ID.
    **"Concise" never means dropping the issue ID or the `prefix(scope):` form**
@@ -97,9 +100,10 @@ runs `gh pr create` unprompted.
      restatement, local-only paths (`docs/superpowers/specs/...`), plan/spec
      narration, self-congratulation, prose paragraphs.
    - Test: _"if this section were missing, what would the reviewer get wrong?"_
-5. **Length** — the Why / What / How sections total **20 rendered lines or
-   fewer**, headings excluded, each section 1–4 bullets. Screenshots, the stack
-   section, and template-required sections do not count toward the cap.
+5. **Length** — the Why / What / How sections total **20 lines of Markdown
+   source or fewer**, headings excluded, each section 1–4 bullets. Screenshots,
+   the stack section, and template-required sections do not count toward the
+   cap.
 6. **Self-check before applying** — for every line: _"if this line were missing,
    what would the reviewer get wrong?"_ No concrete answer → delete it.
 7. **Apply** via `gh pr edit`. **Preserve the `## スタック（PR シリーズ）`
