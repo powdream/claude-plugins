@@ -35,7 +35,7 @@
     {
       "name": "pr-tools",
       "source": "./plugins/pr-tools",
-      "description": "GitHub pull request helpers: maintain a stacked-PR series section across a chain of PRs, and open a PR in Google Chrome"
+      "description": "GitHub pull request helpers: rewrite a PR title and body into a short, convention-matched Why/What/How, maintain a stacked-PR series section across a chain of PRs, and open a PR in Google Chrome"
     },
     {
       "name": "session-tools",

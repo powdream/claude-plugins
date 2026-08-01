@@ -55,8 +55,16 @@ locally in the macOS default app.
 
 ### pr-tools
 
-GitHub pull request helpers: maintain a stacked-PR series section across a chain
-of PRs, and open a PR in Google Chrome.
+GitHub pull request helpers:
+
+- **pr-rewrite** (skill): rewrites a PR title and body down to the shortest form
+  a reviewer can still decide from — Why / What / How, matched to the repo's own
+  title and body convention, with extra sections only when they carry
+  information the reader cannot get elsewhere.
+- **pr-stack** (skill): maintains the `## スタック（PR シリーズ）` section
+  across a chain of stacked PRs, carrying merged ancestors forward and
+  preserving the rest of each body.
+- **pr-chrome** (skill): opens a PR in Google Chrome.
 
 ```bash
 /plugin install pr-tools@claude-plugins
