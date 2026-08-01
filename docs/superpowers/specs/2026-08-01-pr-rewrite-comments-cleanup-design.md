@@ -94,7 +94,7 @@ runs `gh pr create` unprompted.
      screenshots or video for UI changes, sections the repo's PR template
      requires, verification steps the reviewer must run themselves.
    - Still forbidden: file-by-file change listings, change-volume tables, diff
-     restatement, local-only paths (`superpowers/specs/...`), plan/spec
+     restatement, local-only paths (`docs/superpowers/specs/...`), plan/spec
      narration, self-congratulation, prose paragraphs.
    - Test: _"if this section were missing, what would the reviewer get wrong?"_
 5. **Length** — the Why / What / How sections total **20 rendered lines or
@@ -140,7 +140,7 @@ If a concrete answer cannot be written, delete the comment.
 
 1. Restates the code, or restates the line directly next to it.
 2. Tutorial-style rationale — two sentences or more of explanation.
-3. Change-history commentary (`// 기존 로직 제거`, `// changed from X`).
+3. Change-history commentary (`// removed the old logic`, `// changed from X`).
 4. Section-divider decoration.
 5. Obvious type/name annotations; commented-out code.
 6. Anything already stated in `README`, `AGENTS.md`, or a spec.
