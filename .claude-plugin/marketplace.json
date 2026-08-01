@@ -45,7 +45,7 @@
     {
       "name": "review-tools",
       "source": "./plugins/review-tools",
-      "description": "Cross-review helpers: skills that review an artifact with two independent reviewer agents which check each other and adjudicate any single-reviewer finding before it is adopted (cross-doc-review for prose, cross-code-review for code changes)"
+      "description": "Review helpers: cross-doc-review and cross-code-review review an artifact with two independent reviewer agents which check each other and adjudicate any single-reviewer finding before it is adopted; comments-cleanup strips comments that carry no decision-changing information out of a code change"
     }
   ]
 }

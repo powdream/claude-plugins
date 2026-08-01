@@ -62,6 +62,23 @@ of PRs, and open a PR in Google Chrome.
 /plugin install pr-tools@claude-plugins
 ```
 
+### review-tools
+
+Review helpers:
+
+- **cross-code-review** (skill): reviews a code change with two independent
+  reviewer agents that check each other; a finding only one of them raises must
+  survive the other's attempt to refute it before it is reported.
+- **cross-doc-review** (skill): the same cross-check for prose artifacts —
+  specs, ADRs, PRDs, READMEs, runbooks.
+- **comments-cleanup** (skill): removes comments that carry no decision-changing
+  information from a change, keeping only those whose absence would let someone
+  make a specific wrong change.
+
+```bash
+/plugin install review-tools@claude-plugins
+```
+
 ### session-tools
 
 Session-lifecycle helpers:
