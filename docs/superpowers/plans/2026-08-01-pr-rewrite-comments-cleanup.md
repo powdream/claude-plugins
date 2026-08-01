@@ -24,8 +24,10 @@ validation.
 ## Global Constraints
 
 - SKILL.md prose is **English** (`AGENTS.md`: "All documentation must be written
-  in English"). Only the frontmatter `description` trigger phrases and embedded
-  output templates carry Korean/Japanese.
+  in English"). Korean/Japanese appears only in: the frontmatter `description`
+  trigger phrases, embedded output templates, and a quoted defect specimen whose
+  point depends on the non-English text (`# 등록に必要な権限`, illustrating a
+  mixed-language comment). Ruled by the human partner on 2026-08-01.
 - Skill `name`: lowercase letters, numbers, hyphens only; max 64 chars; must not
   contain `claude` or `anthropic`.
 - Skill `description`: non-empty, max 1024 chars, **one single line** (no YAML
@@ -110,8 +112,8 @@ Ordered by how often they show up:
 
 1. **Restates the code**, or restates the line directly next to it.
 2. **Tutorial-style rationale** — two sentences or more of explanation.
-3. **Change-history commentary** — `// 기존 로직 제거`, `// changed from X`,
-   `// was: ...`. Git already knows.
+3. **Change-history commentary** — `// removed the old logic`,
+   `// changed from X`, `// was: ...`. Git already knows.
 4. **Section-divider decoration** — `// ===== helpers =====`.
 5. **Obvious type or name annotations**, and commented-out code.
 6. **Anything already written** in `README`, `AGENTS.md`, `CLAUDE.md`, or a
