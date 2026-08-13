@@ -194,6 +194,9 @@ verbatim output. Offer to also save it as an `.md` file if the user wants.
 - 다음 항목: plan의 <N번>
 - plan에 없는 방법은 지시하지 않음. 없으면 열린 질문으로 둘 것.
 
+## 완료 판정 (완료 = 증거)
+- ...
+
 ## 적혀있는 것을 믿지 말 것 — 코드·팩트가 정본
 - plan의 진행 상태 서술도 재검증 대상. 충돌 시 코드가 정본.
 
@@ -211,8 +214,6 @@ verbatim output. Offer to also save it as an `.md` file if the user wants.
 ## 작성자 경고 (함정 — 시간 낭비 방지용)
 - ...
 
-## 완료 판정 (완료 = 증거)
-- ...
 ## 제약 (해서는 안 되는 것)
 - ...
 

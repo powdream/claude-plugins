@@ -131,8 +131,9 @@ Title / mode decision (evidence: plan file path)
 ## Goal
 ## Plan pointer + how far it has been executed (with evidence)
    + which numbered plan item is next
+## 완료 판정
 ## 적혀있는 것을 믿지 말 것 (the plan's own progress claims are re-verified too)
-## 반드시 읽을 자료 / four buckets / 완료 판정 / 제약
+## 반드시 읽을 자료 / four buckets / 제약
 ## 첫 액션: read the plan, re-verify the progress point → executing-plans
 ```
 
