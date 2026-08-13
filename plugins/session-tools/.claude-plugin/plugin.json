@@ -1,5 +1,5 @@
 {
   "name": "session-tools",
-  "description": "Session-lifecycle helpers. Includes a self-check reminder that re-injects an independent-verification (anti-sycophancy) directive after compaction and periodically in long sessions, and a write-handoff-prompt skill for authoring bias-free continuation prompts to resume work after compaction.",
-  "version": "0.2.0"
+  "description": "Session-lifecycle helpers. Includes a self-check reminder that re-injects an independent-verification (anti-sycophancy) directive after compaction and periodically in long sessions, and a write-handoff-prompt skill for authoring goal-first continuation prompts that hand over the goal to reach rather than the method, leaving the next session to do its own investigation.",
+  "version": "0.3.0"
 }

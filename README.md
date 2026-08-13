@@ -96,9 +96,12 @@ Session-lifecycle helpers:
   override with `SESSION_TOOLS_SELF_CHECK_INTERVAL`), to counter attention decay
   in long sessions.
 - **write-handoff-prompt** (skill): when you ask for a handoff / continuation
-  prompt (e.g. "컴팩션 후 작업 지시 프롬프트 써줘"), authors one that treats
-  documents as intent-only (not ground truth — verify against code), separates
-  settled / fact / open / inferred, and keeps the spec·plan agreement gate.
+  prompt (e.g. "컴팩션 후 작업 지시 프롬프트 써줘"), authors one that leads with
+  the goal to reach and withholds the method, so the next session runs its own
+  investigation and brainstorming. Treats documents as intent-only (not ground
+  truth — verify against code) and separates 확정 / 관측된 사실 / 열린 질문 /
+  작성자 경고. Picks `resume` mode only when an agreed plan file actually
+  exists; otherwise `goal` mode.
 
 ```bash
 /plugin install session-tools@claude-plugins
