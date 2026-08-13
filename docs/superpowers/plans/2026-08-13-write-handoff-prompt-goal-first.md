@@ -549,6 +549,10 @@ of it has been executed, invoke the skill again. Check:
 - [ ] Every step mentioned traces back to a numbered item in the plan file —
       nothing invented.
 - [ ] `## 첫 액션` routes to `executing-plans`.
+- [ ] With an agreed plan file that has **not** been started yet, the skill
+      still picks `resume` mode; `## Plan 진행 지점` reports zero items executed
+      with the first plan item next, still citing evidence for that claim; and
+      `## 첫 액션` routes to `executing-plans`, not `brainstorming`.
 
 - [ ] **Step 4: Negative check — the escape hatch is closed**
 
@@ -558,7 +562,7 @@ the skill.
 - [ ] It picks `goal` mode, not `resume`, and says `plan 문서 없음`.
 
 If it picks resume mode, the mode decision is not objective enough — tighten the
-three-condition wording in `SKILL.md` and re-run.
+two-condition wording in `SKILL.md` and re-run.
 
 - [ ] **Step 5: Record the result**
 
