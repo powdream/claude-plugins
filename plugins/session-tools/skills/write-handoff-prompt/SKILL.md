@@ -48,11 +48,10 @@ not.
 
 ## Mode decision — do this first
 
-**`resume` mode — only when all three hold:**
+**`resume` mode — only when both hold:**
 
 - a plan file exists at a real path (you can print it),
-- the user agreed to that plan,
-- part of it has already been executed.
+- the user agreed to that plan.
 
 **`goal` mode — everything else.** A plan that lives only in your head, one
 agreed verbally in conversation, or a spec with no plan file, is goal mode. When
@@ -70,7 +69,8 @@ down and agreed.
 ## Output contract — `goal` mode
 
 Fill every pointer with a **real** path / URL / branch / commit — no
-placeholders.
+placeholders. A pointer this session did not already establish is omitted, or
+named as unknown for the executor to find — do not go looking for it.
 
 1. **Title + mode line** — one line each.
 2. **`## Goal`** — what must be true when the work is done, and why it matters.
@@ -78,6 +78,8 @@ placeholders.
    how to get there.
 3. **`## 완료 판정`** — how the executor proves it is done. Evidence, not
    assertion: a command whose output settles it, a state that can be observed.
+   When no such command is known, the criterion goes to `열린 질문` rather than
+   being invented.
 4. **`## 적혀있는 것을 믿지 말 것`** — principle 1, stated to the executor:
    re-verify everything below against current code/PR/execution before any
    implementation action.
@@ -88,24 +90,32 @@ placeholders.
 6. **Four labeled buckets** — never blend status, fact, and assumption into one
    narrative:
    - `## 확정 (User 결정 — 재론 금지)` — settled by the user; don't relitigate.
-   - `## 관측된 사실 (명령어+출력+시점 — 재검증 대상)` — what was observed, with
-     the command and its verbatim output and when. **No interpretation.**
+   - `## 관측된 사실 (명령어/출처+출력/인용+시점 — 재검증 대상)` — what was
+     observed, with the command or source and its verbatim output or quote and
+     when. **No interpretation.**
    - `## 열린 질문 (User 결정 대기 — 임의 결정 금지)` — open; the executor must
      not decide alone.
-   - `## 작성자 경고 (함정 한정)` — hazards that would waste the executor's
-     time. **Never a solution direction.**
+   - `## 작성자 경고 (함정 — 시간 낭비 방지용)` — hazards that would waste the
+     executor's time. **Never a solution direction.**
 7. **`## 제약`** — what must not be done, and the boundaries to respect. A
    constraint rules options out; it does not pick one.
 8. **`## 첫 액션`** — read the listed material, re-verify current state, then
-   enter `brainstorming`. No code before user approval.
+   enter `brainstorming` → `writing-plans`. No code before user approval.
 
 ## Output contract — `resume` mode
 
-Same as goal mode, with two differences:
+Same as goal mode, with four differences:
 
 - After `## Goal`, add **`## Plan 진행 지점`** — the plan file path, how far it
   has been executed with the evidence for that claim, and which numbered plan
-  item is next. Progress claims are re-verification targets like any other.
+  item is next. Zero items executed is a valid claim — the plan may be agreed
+  but unstarted — but it still needs evidence, and the next item is then the
+  first one in the plan. Progress claims are re-verification targets like any
+  other.
+- **`## 적혀있는 것을 믿지 말 것`** carries one more bullet: the plan's own
+  progress claims are also re-verification targets, not just its steps.
+- **`## 반드시 읽을 자료`** carries one more pointer: the plan file, marked as
+  the 정본 of the agreed method.
 - `## 첫 액션` is: read the plan, re-verify the progress point, then
   `executing-plans`.
 
@@ -164,8 +174,8 @@ verbatim output. Offer to also save it as an `.md` file if the user wants.
 
 ## 확정 (User 결정 — 재론 금지)
 - ...
-## 관측된 사실 (명령어+출력+시점 — 재검증 대상)
-- `<command>` → <출력 원문> (<시점>)   ※ 해석·원인 서술 금지
+## 관측된 사실 (명령어/출처+출력/인용+시점 — 재검증 대상)
+- `<command 또는 출처>` → <출력 원문 또는 인용> (<시점>)   ※ 해석·원인 서술 금지
 ## 열린 질문 (User 결정 대기 — 임의 결정 금지)
 - ...  (작성자가 모르는 것은 여기. 추측으로 메우지 말 것)
 ## 작성자 경고 (함정 — 시간 낭비 방지용)
@@ -175,7 +185,7 @@ verbatim output. Offer to also save it as an `.md` file if the user wants.
 - ...  (경계 조건일 뿐, 방법 지시가 아님)
 
 ## 첫 액션
-위 자료를 전부 읽고 현재 코드로 재검증한 뒤, brainstorming으로 진입.
+위 자료를 전부 읽고 현재 코드로 재검증한 뒤, brainstorming → writing-plans로 진입.
 코드 착수 전 User 승인 필수.
 ```
 
@@ -183,14 +193,14 @@ verbatim output. Offer to also save it as an `.md` file if the user wants.
 
 ```
 # 작업 지시: <한 줄 요약>
-모드: resume (근거: 합의된 plan 파일 <path>, 일부 실행됨)
+모드: resume (근거: 합의된 plan 파일 <path>)
 
 ## Goal — 완료 시 무엇이 참이어야 하는가
 - <달성 상태>. 왜 필요한가: <이유>
 
 ## Plan 진행 지점
 - Plan (합의된 방법의 정본): <path>
-- 어디까지 실행됨: <항목> — 근거: `<command>` → <출력> (<시점>)
+- 어디까지 실행됨: <항목, 없으면 "없음(미착수)"> — 근거: `<command>` → <출력> (<시점>)
 - 다음 항목: plan의 <N번>
 - plan에 없는 방법은 지시하지 않음. 없으면 열린 질문으로 둘 것.
 
@@ -198,17 +208,22 @@ verbatim output. Offer to also save it as an `.md` file if the user wants.
 - ...
 
 ## 적혀있는 것을 믿지 말 것 — 코드·팩트가 정본
+- Spec/Linear/memory/이 프롬프트는 과거 시점 서술. 현재 코드와 어긋날 수 있음.
+- 문서 = 의도·결정의 정본.  코드 + 관측된 팩트 = 현재 상태·사실의 정본.
+- 아래 자료를 전부 읽고 현재 코드/PR/실행으로 재검증한 뒤에만 착수.
 - plan의 진행 상태 서술도 재검증 대상. 충돌 시 코드가 정본.
 
 ## 반드시 읽을 자료 (전부 읽기 전 착수 금지)
-- Plan: <path>          - Spec: <path>
-- 코드: <paths>          - PR / Linear: <urls>
+- Plan (합의된 방법의 정본): <path>
+- Spec (의도·결정의 정본): <path>
+- 코드 (현재 상태의 정본): <paths>
+- PR / Linear: <urls>   - memory: [[...]]
 - 브랜치 / commit / worktree: <...>
 
 ## 확정 (User 결정 — 재론 금지)
 - ...
-## 관측된 사실 (명령어+출력+시점 — 재검증 대상)
-- `<command>` → <출력 원문> (<시점>)   ※ 해석·원인 서술 금지
+## 관측된 사실 (명령어/출처+출력/인용+시점 — 재검증 대상)
+- `<command 또는 출처>` → <출력 원문 또는 인용> (<시점>)   ※ 해석·원인 서술 금지
 ## 열린 질문 (User 결정 대기 — 임의 결정 금지)
 - ...
 ## 작성자 경고 (함정 — 시간 낭비 방지용)

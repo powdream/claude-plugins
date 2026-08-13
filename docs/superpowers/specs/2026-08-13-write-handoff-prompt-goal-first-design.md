@@ -67,8 +67,8 @@ The current skill already branches on "agreed spec/plan exists or not", but the
 branch only affects which skill to route to. Promote it to a mode that governs
 the whole output contract.
 
-- **`resume` mode** — allowed **only** when a plan file exists at a real path,
-  the user agreed to it, and part of it has already been executed.
+- **`resume` mode** — allowed **only** when a plan file exists at a real path
+  and the user agreed to it.
 - **`goal` mode** — everything else. A plan that exists only in the writer's
   head, agreed verbally in conversation, or a spec without a plan, is **not**
   resume mode.
@@ -96,7 +96,7 @@ Record only what this session already established. Anything unknown goes to
 | Current       | Becomes       | Policy change                                                                                           |
 | ------------- | ------------- | ------------------------------------------------------------------------------------------------------- |
 | `확정`        | `확정`        | unchanged                                                                                               |
-| `확인된 사실` | `관측된 사실` | command + verbatim output + timestamp only; interpretation and cause forbidden                          |
+| `확인된 사실` | `관측된 사실` | command or source + verbatim output or quote + timestamp only; interpretation and cause forbidden       |
 | `열린 질문`   | `열린 질문`   | unchanged                                                                                               |
 | `작성자 추정` | `작성자 경고` | hazards only (generated code, known flaky test, do-not-touch); proposing a solution direction forbidden |
 
