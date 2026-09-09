@@ -59,3 +59,14 @@ or adapt it for a different artifact type.
     it is an SVG asset committed beside the document and referenced as an image,
     with its states and labels also present as text (alt text or an adjacent
     table) so the content stays searchable.
+17. **Affirmative register.** Body sentences state what exists, what it does,
+    what it requires, and why the reader does it. Absence, exclusion, and
+    impossibility appear in a scope / non-goals list or a comparison cell, one
+    line each; elsewhere the same fact is written as its positive counterpart
+    (`macOS と Linux で動く`, not `Windows をサポートしない`). Openings —
+    document, section, paragraph — name the thing; the reason it exists sits in
+    the background section.
+18. **Conclusion first.** The line after the H1 states the decision and its
+    scale; each section's and each paragraph's first sentence carries its
+    conclusion. Reading only the first sentences yields the document's
+    argument.

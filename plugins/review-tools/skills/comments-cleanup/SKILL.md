@@ -1,13 +1,13 @@
 ---
 name: comments-cleanup
-description: Remove unnecessary comments from a code change — restated code, tutorial-length rationale, change-history notes, decorative dividers, commented-out code — keeping only comments whose absence would cause a specific wrong change. Asks first whether to clean only the changed lines or every comment in the changed files. Use when the user asks to tidy, prune, or delete unnecessary, verbose, or redundant comments, or says the comments are too many or too verbose. Trigger phrases: "불필요한 주석 정리", "주석 지워", "주석이 너무 verbose", "인라인 주석 정리해줘", "모든 수정에 주석 달지 마", "clean up unnecessary comments", "too many inline comments".
+description: Remove unnecessary comments from a code change — restated code, tutorial-length rationale, change-history notes, decorative dividers, commented-out code — keeping only comments whose absence would cause a specific wrong change, each rewritten to state what the code does. Asks first whether to clean only the changed lines or every comment in the changed files. Use when the user asks to tidy, prune, or delete unnecessary, verbose, or redundant comments, or says the comments are too many or too verbose. Trigger phrases: "불필요한 주석 정리", "주석 지워", "주석이 너무 verbose", "인라인 주석 정리해줘", "모든 수정에 주석 달지 마", "clean up unnecessary comments", "too many inline comments", "정당화 주석 지워", "Needed 주석 정리", "doc comment 첫 문장 고쳐", "rewrite justification comments".
 argument-hint: '[path ...]'
 ---
 
 # Comments Cleanup
 
 Strips comments that carry no decision-changing information out of a change, and
-compresses the ones that survive.
+rewrites the ones that survive into one line that states what the code does.
 
 ## 1. Pick the scope — ask first
 
@@ -66,17 +66,41 @@ For every comment in scope, answer one question:
 Write the answer down before deciding. No concrete answer → delete the comment.
 "It adds context" and "it explains the code" are not answers.
 
+A comment that passes is not finished. It is rewritten into the shape in §4,
+and the answer you wrote down is what the rewritten line says: the behaviour
+the wrong change would break, stated as what the code does.
+
+A doc comment on a public or exported declaration gets a second question:
+
+> **Beyond its name and signature, what does this thing do?**
+
+That answer is the doc comment's first sentence. Who calls it, when, and why it
+exists are not answers; the call sites carry those. The answer is more than the
+name when it states the input, the output, or a guarantee: `Exporter renders a
+day's ledger rows as a CSV file` names both ends, `Exporter exports` is the
+name. When the answer is only the name, the comment goes. When the repository's linter requires a doc comment on
+every exported identifier (Go `revive` `exported`, Dart
+`public_member_api_docs`), the one-sentence name form stays.
+
 ## 3. Delete these
 
 Ordered by how often they show up:
 
 1. **Restates the code**, or restates the line directly next to it.
 2. **Tutorial-style rationale** — two sentences or more of explanation.
-3. **Change-history commentary** — `// removed the old logic`,
+3. **Justification** — `// Needed: …`, `// No lock: …`, `// We chose X because
+   …`. The comment defends a choice. When the code shows the consequence
+   (`WithTimeout(ctx, deployTimeout)` sits on the next line), the comment goes.
+   When the consequence names something outside this file — a lock held
+   elsewhere, a default being overridden, a service's behaviour — the comment
+   becomes that consequence, in the shape in §4.
+4. **Usage narration** — who calls it, when, from where: `is used by the deploy
+   workflow when a merge to main happens`. Call sites show it.
+5. **Change-history commentary** — `// removed the old logic`,
    `// changed from X`, `// was: ...`. Git already knows.
-4. **Section-divider decoration** — `// ===== helpers =====`.
-5. **Obvious type or name annotations**, and commented-out code.
-6. **Anything already written** in `README`, `AGENTS.md`, `CLAUDE.md`, or a
+6. **Section-divider decoration** — `// ===== helpers =====`.
+7. **Obvious type or name annotations**, and commented-out code.
+8. **Anything already written** in `README`, `AGENTS.md`, `CLAUDE.md`, or a
    spec.
 
 ## 4. Keep these
@@ -104,6 +128,33 @@ Keep by judgement:
 - One line of reason per exception, or per `false` entry in a config list.
 - Cross-file mapping pointers (jsdoc or inline) a reader cannot infer locally.
 
+### The shape of a surviving comment
+
+A surviving comment is one line that states what the code does or guarantees at
+that point. Its subject is the code, and its verb is affirmative.
+
+- An inline comment names the behaviour: what runs, what is returned, what is
+  guaranteed, what is skipped and what happens instead.
+- A doc comment's first sentence names the declaration and what it does, in the
+  language's doc convention (Go: `Deployer registers …`; Dart: `/// Computes
+  …`). Constraints the signature does not carry follow, one line each.
+- A comment on a setting that overrides a default states what the setting makes
+  happen.
+- The line is the consequence and nothing after it. A tail that begins with
+  `because`, `so that`, `to avoid`, `otherwise`, `would`, or `; the X needs` is
+  the justification coming back. Cut the tail; when the code shows what is
+  left, the comment goes.
+
+| Before | After |
+|---|---|
+| `// Deployer is used by the deploy workflow when a merge to main happens, because the workflow needs a single entry point to push a task definition and wait for the service to become stable.` | `// Deployer registers a task definition and waits for the ECS service to stabilize.` |
+| `// No lock: taking the deploy lock here would block manual deploys from the console.` | `// UpdateService runs outside the deploy lock; console deploys proceed concurrently.` |
+| `// Needed: without the timeout a stuck service blocks the runner forever.` | deleted — `WithTimeout(ctx, deployTimeout)` on the next line shows it |
+| `# No lock: locking would block manual applies` | `# Comparison-only plan: output feeds the diff check, never applied.` |
+| `/// Used by CheckoutScreen when a coupon is applied to get the new total.` | `/// Computes the discounted total for a cart with a coupon applied.` |
+| `# chunked to avoid OOM` | deleted — `chunks(rows, BATCH)` on the same line shows the batching |
+| `"""Builds the CSV. We don't stream because the admin button needs the whole file."""` | `"""Builds the CSV for `day` and returns the whole file in memory."""` |
+
 A surviving comment still gets compressed: at two sentences or more, cut it to
 one line.
 
@@ -115,10 +166,10 @@ file has no established one. **Never mix languages inside one comment** —
 
 ## 6. Report
 
-One line per file, comment-line counts only:
+One line per file: comment-line counts, and the number of comments rewritten:
 
 ```
-internal/broker/deploy.go       24 → 11
+internal/broker/deploy.go       24 → 11  (3 rewritten)
 .github/workflows/deploy.yml     7 → 2
 ```
 
