@@ -35,7 +35,7 @@
     {
       "name": "pr-tools",
       "source": "./plugins/pr-tools",
-      "description": "GitHub pull request helpers: rewrite a PR title and body into a short, convention-matched Why/What/How, maintain a stacked-PR series section across a chain of PRs, and open a PR in Google Chrome"
+      "description": "GitHub pull request helpers: rewrite a PR title and body into a short, convention-matched Why/What/How that carries only what the diff cannot show, maintain a stacked-PR series section across a chain of PRs, and open a PR in Google Chrome"
     },
     {
       "name": "session-tools",
@@ -45,7 +45,7 @@
     {
       "name": "review-tools",
       "source": "./plugins/review-tools",
-      "description": "Review helpers: cross-doc-review and cross-code-review review an artifact with two independent reviewer agents which check each other and adjudicate any single-reviewer finding before it is adopted; comments-cleanup strips comments that carry no decision-changing information out of a code change"
+      "description": "Review helpers: cross-doc-review and cross-code-review review an artifact with two independent reviewer agents which check each other and adjudicate any single-reviewer finding before it is adopted; comments-cleanup strips comments that carry no decision-changing information out of a code change and rewrites the survivors to state what the code does"
     }
   ]
 }
