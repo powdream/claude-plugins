@@ -1,14 +1,14 @@
 ---
 name: pr-rewrite
-description: Write or rewrite a GitHub pull request title and body so it is short, structured, and matched to the repository's own convention — Why / What / How as the default skeleton, extra sections only when they carry information the reader cannot get elsewhere, and never a restatement of the diff. Use when the user asks to write, shorten, tidy, or restructure a PR title or body, or says the PR is too long, too verbose, unstructured, or not following convention. Trigger phrases: "PR 본문 간결하게", "pr 제목 너무 길어", "본문 정리해줘", "구조적으로 작성해", "소설 쓰지 마", "diff 내용 옮기지 마", "repo 관습에 맞춰서", "make the PR body concise", "shorten this PR description".
+description: Write or rewrite a GitHub pull request title and body so it is short, structured, and matched to the repository's own convention — Why / What / How as the default skeleton, extra sections only when they carry information the reader cannot get elsewhere, and never a restatement of the diff. Use when the user asks to write, shorten, tidy, or restructure a PR title or body, or says the PR is too long, too verbose, unstructured, or not following convention. Trigger phrases: "PR 본문 간결하게", "pr 제목 너무 길어", "본문 정리해줘", "구조적으로 작성해", "소설 쓰지 마", "diff 내용 옮기지 마", "repo 관습에 맞춰서", "make the PR body concise", "shorten this PR description", "diff 보면 아는 건 빼", "배경만 남겨", "없는 것부터 쓰지 마", "write only what the diff cannot show".
 argument-hint: '[PR number ...]'
 ---
 
 # PR Rewrite
 
-Rewrites a PR title and body down to the shortest form a reviewer can still
-decide from. The failure it exists to prevent: a body that narrates the diff
-file-by-file in prose.
+Rewrites a PR title and body down to what a reviewer with the diff open still
+needs. The two failures it exists to prevent: a body that narrates the diff, and
+a body that opens with what was missing before the change.
 
 ## Target
 
@@ -62,9 +62,29 @@ description is the job; deleting required structure is not.
 
 Three sections, in that order. They are enough for most PRs.
 
-- **Why** — what was broken or missing, stated from the reader's side.
-- **What** — the change at the level of behaviour, not files.
-- **How** — the approach the reviewer needs in order to read the diff.
+- **Why** — the requirement the change serves, and what becomes true once it
+  lands. The line names what is needed; a triggering bug or ticket is its
+  grounds, in parentheses or one nested bullet.
+- **What** — the behaviour after the change, as the user or the caller sees it.
+- **How** — the background the diff cannot show: a constraint from outside the
+  repository, a measured behaviour of a dependency, the reason behind a chosen
+  number. How exists only when at least one line survives the test below.
+
+**Each line answers a question the diff leaves open.** Test per line:
+_"with the diff open, does the reviewer already know this?"_ Yes → the line
+goes. A function name, a call-site count, a file name, a default value, a test
+name, a package added to `pubspec.yaml` or `package.json` — the diff shows all
+six.
+
+**Each line states what the change does, needs, or makes true.** Read each
+line's main verb. しない・ない・not・no・never → rewrite the line as what happens
+instead: `以降は端末のキャッシュから表示する`, in place of `再取得しない`. A
+rejected alternative lives in the ticket or the ADR. When the change stops short
+of something a reviewer would expect it to cover, one line at the end of What
+names that boundary, and that line is the one this verb check skips.
+
+A repository template's own sections follow the same two tests: a `変更内容`
+section holds the behaviour after the change, never the file list.
 
 **Budget: these three sections total 20 lines of Markdown source or fewer**
 (headings excluded), 1–4 bullets each. Bullets, not paragraphs.
@@ -88,6 +108,11 @@ Screenshots and the stack section do not count toward the 20-line budget.
 Run the same test per line: _"if this line were missing, what would the reviewer
 get wrong?"_ No concrete answer → delete the line. Then confirm:
 
+- [ ] Every line passed _"with the diff open, does the reviewer already know
+      this?"_ — no function name, file name, call-site count, default value,
+      test name, or added package the diff shows
+- [ ] Every line's main verb is affirmative — no しない・ない・not・never outside
+      the one boundary line at the end of What
 - [ ] Why / What / How total 20 lines of Markdown source or fewer
 - [ ] Title carries the issue ID and prefix form, if the repo's convention uses
       one
@@ -132,15 +157,22 @@ Before — tag-padded title, file-by-file listing, self-congratulatory closer:
 The pipeline is much cleaner now.
 ```
 
-After — issue ID and `prefix(scope):` kept, everything else cut:
+After — issue ID and `prefix(scope):` kept, every line something the diff
+cannot show:
 
 ```
 feat(notifier): retry failed sends (ABC-123)
 
 ## Why
-- Transient 5xx from the provider dropped notifications silently.
+- A notification has to reach the user or be reported as failed (ABC-101, ABC-117).
 ## What
-- Sends are retried up to `maxRetries`, then surfaced as failed.
+- A send is retried up to `maxRetries`, then reported as failed.
+- A 4xx is reported as failed on the first attempt.
 ## How
-- Backoff lives in `sendWithRetry`; callers unchanged.
+- The provider's 5xx cleared within 2 s in every case over a month, so backoff starts at 1 s.
 ```
+
+Lines cut from the draft: four the diff already shows (`sendWithRetry` wraps
+`provider.send`; three call sites switched; `maxRetries` defaults to 3; four
+tests added) and one rejected alternative (the persistent queue), which lives in
+the ticket.
