@@ -79,9 +79,9 @@ Review helpers:
   survive the other's attempt to refute it before it is reported.
 - **cross-doc-review** (skill): the same cross-check for prose artifacts —
   specs, ADRs, PRDs, READMEs, runbooks.
-- **comments-cleanup** (skill): removes comments that carry no decision-changing
-  information from a change, keeping only those whose absence would let someone
-  make a specific wrong change.
+- **comments-cleanup** (skill): removes comments that tell the reader nothing
+  beyond what the code itself says from a change, keeping only those that carry
+  meaning the code does not.
 
 ```bash
 /plugin install review-tools@claude-plugins

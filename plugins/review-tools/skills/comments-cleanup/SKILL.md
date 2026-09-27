@@ -1,13 +1,13 @@
 ---
 name: comments-cleanup
-description: Remove unnecessary comments from a code change — restated code, tutorial-length rationale, change-history notes, decorative dividers, commented-out code — keeping only comments whose absence would cause a specific wrong change, each rewritten to state what the code does. Asks first whether to clean only the changed lines or every comment in the changed files. Use when the user asks to tidy, prune, or delete unnecessary, verbose, or redundant comments, or says the comments are too many or too verbose. Trigger phrases: "불필요한 주석 정리", "주석 지워", "주석이 너무 verbose", "인라인 주석 정리해줘", "모든 수정에 주석 달지 마", "clean up unnecessary comments", "too many inline comments", "정당화 주석 지워", "Needed 주석 정리", "doc comment 첫 문장 고쳐", "rewrite justification comments".
+description: Remove unnecessary comments from a code change — restated code, private symbols, tutorial-length rationale, change-history notes, decorative dividers, commented-out code — keeping only comments that tell the reader something the code itself does not, each rewritten to state what the code does; offers a rename or a refactor instead when the code itself could carry the meaning. Asks first whether to clean only the changed lines or every comment in the changed files. Use when the user asks to tidy, prune, or delete unnecessary, verbose, or redundant comments, or says the comments are too many or too verbose. Trigger phrases: "불필요한 주석 정리", "주석 지워", "주석이 너무 verbose", "인라인 주석 정리해줘", "모든 수정에 주석 달지 마", "clean up unnecessary comments", "too many inline comments", "정당화 주석 지워", "Needed 주석 정리", "doc comment 첫 문장 고쳐", "rewrite justification comments", "주석 대신 이름으로", "주석 대신 리팩터링".
 argument-hint: '[path ...]'
 ---
 
 # Comments Cleanup
 
-Strips comments that carry no decision-changing information out of a change, and
-rewrites the ones that survive into one line that states what the code does.
+Strips comments that tell the reader nothing beyond what the code itself says,
+and rewrites the survivors into one line that states what the code does.
 
 ## 1. Pick the scope — ask first
 
@@ -55,20 +55,68 @@ name those paths in the question text, so the choice is made with them in view:
 
 An untracked file enters the working set only through that third option. Never
 widen past what the user picked, and never touch a file the change did not
-already modify, unless a path argument named it.
+already modify, unless a path argument named it. The one exception: a rename
+or an extraction approved in §2 may follow its references into files outside
+this scope.
 
-## 2. Apply the survival test
+## 2. Apply the meaning test
 
 For every comment in scope, answer one question:
 
-> **If this comment were gone, what specific wrong change would somebody make?**
+> **Does this comment tell the reader something the code itself does not?**
 
-Write the answer down before deciding. No concrete answer → delete the comment.
-"It adds context" and "it explains the code" are not answers.
+Meaning beyond the code is one of:
 
-A comment that passes is not finished. It is rewritten into the shape in §4,
-and the answer you wrote down is what the rewritten line says: the behaviour
-the wrong change would break, stated as what the code does.
+- why the code is this way
+- a rule that lives outside this code — a server, the app the code was ported
+  from, an external tool
+- domain meaning
+- a trap
+
+Context the code does not carry is a reason to keep the comment, not a reason
+to delete it. Write the answer down before deciding.
+
+Always delete, whatever else is true:
+
+1. **Restates the code** — what a name, a type, the next line, or the control
+   flow already says.
+2. **Private symbols** — notation a reader of this code cannot resolve. §3
+   names what counts and what is allowed.
+
+One way to find a trap: ask what specific wrong change somebody would make with
+the comment gone. That question is auxiliary — a comment can carry meaning
+beyond the code with no such change in view — and its answer is never the
+comment's text.
+
+### Can the code say it instead?
+
+Before keeping a comment that carries meaning beyond the code, check whether
+the code itself could carry that meaning:
+
+| Kind | Signal | Example |
+|---|---|---|
+| Rename | the comment supplies what an unclear name should say | `int d = …; // days since the campaign started` → `daysSinceCampaignStart` |
+| Extract | the comment names a magic value or an expression | `if (status == 3) { // withdrawn` → `CampaignStatus.withdrawn` |
+| Structural refactor | section comments split a long function, or the comment exists because the code is tangled | `// --- validate --- … // --- persist ---` → `validate(); persist();` |
+| None | why, an outside rule, a bug workaround | keep the comment, rewritten to the shape in §4 |
+
+The skill steers the user toward the refactor with **AskUserQuestion**:
+
+- Collect every rename, extract, and refactor candidate after the scan, then
+  ask one question per candidate — at most 4 questions per call, more
+  candidates need more calls.
+- The first option is the refactor itself, with the proposed name or change in
+  the label and `(Recommended)` appended; the second option keeps the comment.
+- The question text states that the comment is deleted once the refactor is
+  applied, how many files the change touches, and "public API change" when the
+  symbol is public or exported.
+
+Applying the approval:
+
+- A rename or an extraction applies at once: update every reference, then run
+  the repository's build, lint, and tests.
+- A structural refactor runs as a separate step after the comment pass,
+  reported on its own; the comment stays until then.
 
 A doc comment on a public or exported declaration gets a second question:
 
@@ -87,25 +135,31 @@ every exported identifier (Go `revive` `exported`, Dart
 Ordered by how often they show up:
 
 1. **Restates the code**, or restates the line directly next to it.
-2. **Tutorial-style rationale** — two sentences or more of explanation.
-3. **Justification** — `// Needed: …`, `// No lock: …`, `// We chose X because
+2. **Private symbols** — plan task numbers, decision ids, internal
+   abbreviations, and a file or symbol name from another repository (for
+   example the source app the code was ported from). Allowed: the ticket key
+   in a TODO that names its removal condition, and the ticket reference of a
+   bug the code works around. A file path inside this repository is code the
+   reader can open, not a private symbol.
+3. **Tutorial-style rationale** — two sentences or more of explanation.
+4. **Justification** — `// Needed: …`, `// No lock: …`, `// We chose X because
    …`. The comment defends a choice. When the code shows the consequence
    (`WithTimeout(ctx, deployTimeout)` sits on the next line), the comment goes.
    When the consequence names something outside this file — a lock held
    elsewhere, a default being overridden, a service's behaviour — the comment
    becomes that consequence, in the shape in §4.
-4. **Usage narration** — who calls it, when, from where: `is used by the deploy
+5. **Usage narration** — who calls it, when, from where: `is used by the deploy
    workflow when a merge to main happens`. Call sites show it.
-5. **Change-history commentary** — `// removed the old logic`,
+6. **Change-history commentary** — `// removed the old logic`,
    `// changed from X`, `// was: ...`. Git already knows.
-6. **Section-divider decoration** — `// ===== helpers =====`.
-7. **Obvious type or name annotations**, and commented-out code.
-8. **Anything already written** in `README`, `AGENTS.md`, `CLAUDE.md`, or a
+7. **Section-divider decoration** — `// ===== helpers =====`.
+8. **Obvious type or name annotations**, and commented-out code.
+9. **Anything already written** in `README`, `AGENTS.md`, `CLAUDE.md`, or a
    spec.
 
 ## 4. Keep these
 
-**Never delete — a tool reads these, not a person.** The survival test does not
+**Never delete — a tool reads these, not a person.** The meaning test does not
 apply; deleting them breaks the build:
 
 - Compiler and toolchain directives — `//go:build linux`, `# noqa: E501`,
@@ -124,9 +178,12 @@ Keep by judgement:
 - Temporary code whose **removal condition names a precise trigger**. "Remove
   someday" does not qualify; "remove once the ledger migration in INF-1234
   lands" does.
+- A comment that names the ticket for a bug it works around (internal tracker
+  or upstream issue).
 - The reason for genuinely non-obvious behaviour — **one line**.
 - One line of reason per exception, or per `false` entry in a config list.
-- Cross-file mapping pointers (jsdoc or inline) a reader cannot infer locally.
+- A pointer to the file this code mirrors, when both files live in this
+  repository and a reader cannot infer the mapping locally.
 
 ### The shape of a surviving comment
 
@@ -166,10 +223,11 @@ file has no established one. **Never mix languages inside one comment** —
 
 ## 6. Report
 
-One line per file: comment-line counts, and the number of comments rewritten:
+One line per file: comment-line counts, the number rewritten, and the number
+renamed or refactored:
 
 ```
-internal/broker/deploy.go       24 → 11  (3 rewritten)
+internal/broker/deploy.go       24 → 11  (3 rewritten, 1 renamed, 1 refactored)
 .github/workflows/deploy.yml     7 → 2
 ```
 
