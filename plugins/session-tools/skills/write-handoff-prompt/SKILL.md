@@ -46,6 +46,23 @@ already know goes to `열린 질문`, or is named as the executor's to investiga
 "Not established yet" is a useful handoff line. A guess dressed as a finding is
 not.
 
+## Before writing: sweep project memories
+
+This sweep keeps `type: project` memories current before the handoff points at
+them. Read every file with `type: project` in the memory directory the system
+prompt names. Judge each file only from facts this session has already
+established, or from one mechanical check (PR state, file existence, merge
+status). Reading code and root-cause analysis are outside this sweep.
+
+| Verdict | Action |
+| --- | --- |
+| Still true | Keep the file |
+| Partly changed | Rewrite it with the current values |
+| No longer true, or the work is finished | Delete the file |
+| No evidence to judge | Leave the file as it is |
+
+After a rewrite or a delete, fix the matching line of the memory index.
+
 ## Mode decision — do this first
 
 **`resume` mode — only when both hold:**
@@ -84,23 +101,48 @@ named as unknown for the executor to find — do not go looking for it.
    re-verify everything below against current code/PR/execution before any
    implementation action.
 5. **`## 반드시 읽을 자료`** — the pointers that are unrecoverable after
-   compaction: spec path, code paths, PR/Linear URLs, memory files,
-   branch/commit/worktree. Mark spec as the 정본 of intent, code as the 정본 of
-   current state. Point at where to look; do not summarize what is there.
+   compaction: spec path, code paths, PR/Linear URLs, branch/commit/worktree,
+   and the memory files whose body the first action must read (the memory index
+   loads automatically every session). Mark spec as the 정본 of intent, code as
+   the 정본 of current state. Point at where to look; do not summarize what is
+   there.
 6. **Four labeled buckets** — never blend status, fact, and assumption into one
    narrative:
    - `## 확정 (User 결정 — 재론 금지)` — settled by the user; don't relitigate.
-   - `## 관측된 사실 (명령어/출처+출력/인용+시점 — 재검증 대상)` — what was
-     observed, with the command or source and its verbatim output or quote and
-     when. **No interpretation.**
-   - `## 열린 질문 (User 결정 대기 — 임의 결정 금지)` — open; the executor must
-     not decide alone.
+     When a decision record exists (spec decision table, ledger, ADR), this
+     section holds that record's location (path + section/row or grep pattern)
+     and the decisions made in this session (number + location). When no
+     decision record exists, write the decisions here directly.
+   - `## 재검증할 상태 (다음 세션의 첫 액션이 기대는 상태 — 명령으로 다시 잰다)`
+     — a table `무엇 | 확인 명령 | 마지막 값 (시각)`. 마지막 값 is the verbatim
+     output of the command and carries no interpretation. Grounds of decisions
+     already made, and state the first action does not rely on, live in the
+     decision record.
+   - `## 열린 질문 (해소 조건 포함)` — open; the executor must not decide alone.
+     Before writing, sort each candidate question (carried-over ones from an
+     earlier handoff included) into one of these:
+     1. The user can answer → ask in this conversation, then move the answer
+        to `## 확정` (or the decision record).
+     2. The executor's investigation resolves it → move it to an investigation
+        step in `## 첫 액션` and name where to look.
+     3. It remains → one line: `<질문> — 정해지려면: <무엇> · 언제: <시점·계기>`.
    - `## 작성자 경고 (함정 — 시간 낭비 방지용)` — hazards that would waste the
      executor's time. **Never a solution direction.**
-7. **`## 제약`** — what must not be done, and the boundaries to respect. A
-   constraint rules options out; it does not pick one.
-8. **`## 첫 액션`** — read the listed material, re-verify current state, then
-   enter `brainstorming` → `writing-plans`. No code before user approval.
+7. **`## 작업 방식 (상황 → 방법)`** — how the executor handles the situations it
+   will meet in this work. One line per situation the executor actually meets:
+   `<실행자가 맞닥뜨릴 상황>에서는 <방법>. (근거: <결정 위치>)`. An entry that
+   blocks an option is written as "X 대신 Y 로 한다". This section holds
+   procedure about environment, tools, approvals, and repositories; the method
+   that achieves the Goal (design, solution) belongs to the plan or the
+   executor (principle 2). Standing conventions already in the executor's
+   CLAUDE.md or memory get one line by name (see "Reference standing
+   conventions by name"). An entry that already stood in the previous handoff
+   and is still needed as is goes up into the standing rules document the
+   executor reads (CLAUDE.md, the project rules file), not into the handoff.
+8. **`## 첫 액션`** — read the listed material, re-verify current state with the
+   commands in `## 재검증할 상태`, carry out the investigation steps moved from
+   `열린 질문` (written only when there are any), then enter `brainstorming` →
+   `writing-plans`. No code before user approval.
 
 ## Output contract — `resume` mode
 
@@ -121,7 +163,7 @@ Same as goal mode, with four differences:
 
 ## Observation vs interpretation
 
-The line the `관측된 사실` bucket turns on:
+The line the `재검증할 상태` bucket turns on:
 
 | Write this                               | Not this                                    |
 | ---------------------------------------- | ------------------------------------------- |
@@ -169,23 +211,29 @@ verbatim output. Offer to also save it as an `.md` file if the user wants.
 ## 반드시 읽을 자료 (전부 읽기 전 착수 금지)
 - Spec (의도·결정의 정본): <path>
 - 코드 (현재 상태의 정본): <paths>
-- PR / Linear: <urls>   - memory: [[...]]
+- PR / Linear: <urls>   - memory: [[...]]   ※ memory 는 첫 액션이 본문을 읽어야 하는 것만 (색인은 매 세션 자동 로드)
 - 브랜치 / commit / worktree: <...>
 
 ## 확정 (User 결정 — 재론 금지)
-- ...
-## 관측된 사실 (명령어/출처+출력/인용+시점 — 재검증 대상)
-- `<command 또는 출처>` → <출력 원문 또는 인용> (<시점>)   ※ 해석·원인 서술 금지
-## 열린 질문 (User 결정 대기 — 임의 결정 금지)
-- ...  (작성자가 모르는 것은 여기. 추측으로 메우지 말 것)
+- 결정 기록: <경로> — <절/행 또는 grep 패턴>   ※ 결정 기록 문서(spec 결정 표 · 원장 · ADR)가 있을 때
+- 이번 세션의 새 결정: <번호> — <결정 기록 안의 위치>   ※ 결정 기록 문서가 있을 때
+- <결정 내용>   ※ 결정 기록 문서가 없을 때 이 자리에 직접 적는다
+## 재검증할 상태 (다음 세션의 첫 액션이 기대는 상태 — 명령으로 다시 잰다)
+| 무엇 | 확인 명령 | 마지막 값 (시각) |
+|---|---|---|
+| <상태> | `<command 또는 출처>` | <출력 원문 또는 인용> (<시각>) |
+※ 마지막 값에는 출력 원문(또는 인용)만 쓴다
+## 열린 질문 (해소 조건 포함)
+- <질문> — 정해지려면: <무엇> · 언제: <시점·계기>   (작성자가 모르는 것은 여기. 추측으로 메우지 말 것)
 ## 작성자 경고 (함정 — 시간 낭비 방지용)
 - ...  (해법 방향 제시 아님)
 
-## 제약 (해서는 안 되는 것)
-- ...  (경계 조건일 뿐, 방법 지시가 아님)
+## 작업 방식 (상황 → 방법)
+- <실행자가 맞닥뜨릴 상황>에서는 <방법>. (근거: <결정 위치>)   ※ 환경·도구·승인·리포를 다루는 절차만. Goal 을 이루는 방법(설계·해법)은 plan 이나 실행자의 몫
 
 ## 첫 액션
-위 자료를 전부 읽고 현재 코드로 재검증한 뒤, brainstorming → writing-plans로 진입.
+위 자료를 전부 읽고 현재 코드로 재검증하고, `## 재검증할 상태` 표의 명령으로 현재 상태를 다시 잰 뒤, brainstorming → writing-plans로 진입.
+조사 단계(열린 질문에서 옮긴 것): <질문> → 볼 곳: <…>   ※ 있을 때만 쓴다
 코드 착수 전 User 승인 필수.
 ```
 
@@ -217,23 +265,29 @@ verbatim output. Offer to also save it as an `.md` file if the user wants.
 - Plan (합의된 방법의 정본): <path>
 - Spec (의도·결정의 정본): <path>
 - 코드 (현재 상태의 정본): <paths>
-- PR / Linear: <urls>   - memory: [[...]]
+- PR / Linear: <urls>   - memory: [[...]]   ※ memory 는 첫 액션이 본문을 읽어야 하는 것만 (색인은 매 세션 자동 로드)
 - 브랜치 / commit / worktree: <...>
 
 ## 확정 (User 결정 — 재론 금지)
-- ...
-## 관측된 사실 (명령어/출처+출력/인용+시점 — 재검증 대상)
-- `<command 또는 출처>` → <출력 원문 또는 인용> (<시점>)   ※ 해석·원인 서술 금지
-## 열린 질문 (User 결정 대기 — 임의 결정 금지)
-- ...
+- 결정 기록: <경로> — <절/행 또는 grep 패턴>   ※ 결정 기록 문서(spec 결정 표 · 원장 · ADR)가 있을 때
+- 이번 세션의 새 결정: <번호> — <결정 기록 안의 위치>   ※ 결정 기록 문서가 있을 때
+- <결정 내용>   ※ 결정 기록 문서가 없을 때 이 자리에 직접 적는다
+## 재검증할 상태 (다음 세션의 첫 액션이 기대는 상태 — 명령으로 다시 잰다)
+| 무엇 | 확인 명령 | 마지막 값 (시각) |
+|---|---|---|
+| <상태> | `<command 또는 출처>` | <출력 원문 또는 인용> (<시각>) |
+※ 마지막 값에는 출력 원문(또는 인용)만 쓴다
+## 열린 질문 (해소 조건 포함)
+- <질문> — 정해지려면: <무엇> · 언제: <시점·계기>
 ## 작성자 경고 (함정 — 시간 낭비 방지용)
 - ...
 
-## 제약 (해서는 안 되는 것)
-- ...
+## 작업 방식 (상황 → 방법)
+- <실행자가 맞닥뜨릴 상황>에서는 <방법>. (근거: <결정 위치>)
 
 ## 첫 액션
-plan을 읽고 진행 지점을 현재 코드로 재검증한 뒤, executing-plans로 진입.
+plan을 읽고 진행 지점을 현재 코드로 재검증하고, `## 재검증할 상태` 표의 명령으로 현재 상태를 다시 잰 뒤, executing-plans로 진입.
+조사 단계(열린 질문에서 옮긴 것): <질문> → 볼 곳: <…>   ※ 있을 때만 쓴다
 ```
 
 ## Common mistakes
@@ -257,3 +311,9 @@ plan을 읽고 진행 지점을 현재 코드로 재검증한 뒤, executing-pla
   can't tell what to challenge. Use the four buckets.
 - **Omitting an artifact the executor needs** (path/URL/branch) → unreachable
   after compaction.
+- **Carrying open questions over from the previous handoff unchanged.** The
+  list grows without sorting, and questions the user or the executor could
+  resolve stay open. Sort each one as item 6 describes first.
+- **Carrying `작업 방식` entries over from the previous handoff unchanged.** The
+  same entry is copied into every handoff. An entry still needed as is moves up
+  into the standing rules document (CLAUDE.md, the project rules file).
